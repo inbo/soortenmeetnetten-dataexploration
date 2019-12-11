@@ -17,7 +17,7 @@ overzicht_bezoeken_tellers %>%
 
 ```
 
-## Getelde aantallen
+## Overzicht getelde aantallen
 
 ### Primaire soorten
 
@@ -45,3 +45,557 @@ overzicht_aantallen_levensvorm_overige_wide %>%
     collapse_rows(c(1,2,3))
 ```
 
+## Verkenning getelde aantallen
+
+### Boomkikker
+
+#### Evolutie getelde aantallen binnen telperiode
+
+Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
+
+```{r boomkikkerAdult, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+soort <- "Boomkikker"
+stadium <- "adult"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_stadium ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+```{r boomkikkerLarve, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+soort <- "Boomkikker"
+stadium <- "larve"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde larven") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_stadium ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde larven") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+#### Evolutie gemiddelde aantallen per jaar
+
+Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
+
+```{r boomkikkerMean, fig.height= 3, fig.width= 7}
+
+soort <- "Boomkikker"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+### Knoflookpad
+
+#### Evolutie getelde aantallen binnen telperiode
+
+Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
+
+```{r knoflookpadAdult, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+soort <- "Knoflookpad"
+stadium <- "adult"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ 
+```
+
+```{r knoflookpadLarve, message=FALSE, warning= FALSE, fig.width= 3, fig.height= 3}
+
+soort <- "Knoflookpad"
+stadium <- "larve"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde larven") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+
+ 
+```
+
+
+#### Evolutie gemiddelde aantallen per jaar
+
+Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
+
+```{r knoflookpadMean, fig.height= 3, fig.width= 6}
+
+soort <- "Knoflookpad"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  filter(levensstadium != "metamorf") %>%
+  ggplot(aes(x= factor(jaar), y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+### Rugstreeppad
+
+#### Evolutie getelde aantallen binnen telperiode
+
+Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
+
+```{r rugstreeppadAdult, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+soort <- "Rugstreeppad"
+stadium <- "adult"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+  
+   q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_stadium ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde larven") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q
+
+ 
+```
+
+```{r rugstreeppadJuveniel, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+soort <- "Rugstreeppad"
+stadium <- "juveniel"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde juvenielen") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+
+ 
+```
+
+```{r rugstreeppadEi, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+soort <- "Rugstreeppad"
+stadium <- "ei"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde eisnoeren") + 
+  ylim(0, max_soort_stadium) + 
+   scale_y_continuous(breaks = (c(0,1))) +
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+
+ 
+```
+
+
+```{r rugstreeppadLarve, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+soort <- "Rugstreeppad"
+stadium <- "larve"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde larven") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+
+ 
+```
+
+
+#### Evolutie gemiddelde aantallen per jaar
+
+Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
+
+```{r rugstreeppadMean, fig.height= 5, fig.width= 6}
+
+soort <- "Rugstreeppad"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  filter(levensstadium != "metamorf") %>%
+  ggplot(aes(x= factor(jaar), y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+### Kamsalamander
+
+#### Evolutie getelde aantallen binnen telperiode
+
+Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
+
+```{r kamsalamanderAdult, message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
+
+soort <- "Kamsalamander"
+stadium <- "adult"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_stadium ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+```{r kamsalamanderLarve, message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
+
+soort <- "Kamsalamander"
+stadium <- "larve"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+
+ 
+```
+
+
+#### Evolutie gemiddelde aantallen per jaar
+
+Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
+
+```{r kamsalamanderMean, fig.height= 5, fig.width= 6}
+
+soort <- "Kamsalamander"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= factor(jaar), y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+### Vuursalamander
+
+#### Evolutie getelde aantallen binnen telperiode
+
+Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
+
+```{r vuursalamanderPostmetamorf, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+soort <- "Vuursalamander"
+stadium <- "post-metamorf"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+  filter(doy > 150) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde post-metamorfen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_stadium ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+#### Evolutie gemiddelde aantallen per jaar
+
+Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
+
+```{r vuursalamanderMean, fig.height= 4, fig.width= 4}
+
+soort <- "Vuursalamander"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+# To be continued
