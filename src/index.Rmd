@@ -1,5 +1,10 @@
 ---
 title: "Dataverkenning soortenmeetnetten"
+author: 
+  -
+    name: "Toon Westra"
+    email: "Toon.Westra@inbo.be"
+  -
 link-citations: TRUE
 site: bookdown::bookdown_site
 output:
@@ -21,13 +26,11 @@ output:
 
 ```{r setup, include = FALSE}
 library(knitr)
+options(knitr.kable.NA = '')
 opts_chunk$set(
   echo = FALSE, 
   eval = TRUE,
   cache = TRUE,
-  dpi = 300,
-  fig.width = 150 / 25.4,
-  fig.height = 100 / 25.4,
   warning = TRUE,
   error = TRUE,
   message = TRUE
@@ -53,3 +56,15 @@ library(kableExtra)
 #   )
 # }
 ```
+
+# Inleiding
+
+Op deze website worden de ingevoerde telgegevens in [meetnetten.be](https://www.meetnetten.be/) verkent. [meetnetten.be](https://www.meetnetten.be/) is een citizen science project dat als doel heeft om Vlaamse en Europese prioritaire soorten te monitoren ter ondersteuning van het Vlaamse natuurbeleid. [meetnetten.be](https://www.meetnetten.be/) bestaat uit een reeks gestructureerde meetnetten die werden ontwikkeld door het Instituut voor Natuur- en Bosonderzoek. Natuurpunt Studie staat in voor de coördinatie van het veldwerk en de telgegevens worden ingezameld door vrijwilligers.
+
+
+```{r banner, fig.width= 9, cache= FALSE}
+include_graphics("../images/emailbanner_meetnetten.jpg", dpi = 150)
+```
+
+
+
