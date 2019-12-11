@@ -1,8 +1,4 @@
 
-```{r banner, fig.width= 9, cache= FALSE}
-include_graphics("../images/emailbanner_meetnetten.jpg", dpi = 150)
-```
-
 
 # Data
 
