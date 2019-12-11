@@ -1,121 +1,121 @@
-"soortgroep";"meetnet";"monitoringsinspanning";"2016";"2017";"2018";"2019"
-"amfibieën";"Boomkikker";"aantal tellingen";106;107;99;48
-"amfibieën";"Boomkikker";"aantal tellers";8;7;9;5
-"amfibieën";"Kamsalamander";"aantal tellingen";NA;105;124;162
-"amfibieën";"Kamsalamander";"aantal tellers";NA;15;17;11
-"amfibieën";"Knoflookpad";"aantal tellingen";NA;12;15;22
-"amfibieën";"Knoflookpad";"aantal tellers";NA;2;7;4
-"amfibieën";"Rugstreeppad";"aantal tellingen";NA;NA;38;42
-"amfibieën";"Rugstreeppad";"aantal tellers";NA;NA;4;12
-"amfibieën";"Vuursalamander";"aantal tellingen";86;107;96;54
-"amfibieën";"Vuursalamander";"aantal tellers";45;49;48;37
-"dagvlinders";"Aardbeivlinder";"aantal tellingen";NA;20;23;11
-"dagvlinders";"Aardbeivlinder";"aantal tellers";NA;7;10;5
-"dagvlinders";"Algemene Vlindermonitoring";"aantal tellingen";116;103;41;39
-"dagvlinders";"Algemene Vlindermonitoring";"aantal tellers";7;6;4;5
-"dagvlinders";"Argusvlinder";"aantal tellingen";105;83;52;48
-"dagvlinders";"Argusvlinder";"aantal tellers";16;15;11;11
-"dagvlinders";"Bruin dikkopje";"aantal tellingen";NA;22;25;15
-"dagvlinders";"Bruin dikkopje";"aantal tellers";NA;5;5;3
-"dagvlinders";"Bruine eikenpage";"aantal tellingen";NA;NA;36;23
-"dagvlinders";"Bruine eikenpage";"aantal tellers";NA;NA;8;6
-"dagvlinders";"Gentiaanblauwtje";"aantal tellingen";16;16;17;4
-"dagvlinders";"Gentiaanblauwtje";"aantal tellers";6;7;8;6
-"dagvlinders";"Grote weerschijnvlinder";"aantal tellingen";NA;NA;22;21
-"dagvlinders";"Grote weerschijnvlinder";"aantal tellers";NA;NA;5;5
-"dagvlinders";"Heivlinder";"aantal tellingen";71;23;38;33
-"dagvlinders";"Heivlinder";"aantal tellers";29;12;13;12
-"dagvlinders";"Klaverblauwtje";"aantal tellingen";NA;6;8;6
-"dagvlinders";"Klaverblauwtje";"aantal tellers";NA;1;2;1
-"dagvlinders";"Kommavlinder";"aantal tellingen";32;30;40;43
-"dagvlinders";"Kommavlinder";"aantal tellers";14;12;11;13
-"dagvlinders";"Oranje zandoogje";"aantal tellingen";NA;47;34;30
-"dagvlinders";"Oranje zandoogje";"aantal tellers";NA;18;13;61
-"dagvlinders";"Veldparelmoervlinder";"aantal tellingen";31;33;34;15
-"dagvlinders";"Veldparelmoervlinder";"aantal tellers";10;14;11;7
-"libellen";"Beekrombout";"aantal tellingen";NA;NA;NA;9
-"libellen";"Beekrombout";"aantal tellers";NA;NA;NA;6
-"libellen";"Bosbeekjuffer";"aantal tellingen";NA;NA;27;7
-"libellen";"Bosbeekjuffer";"aantal tellers";NA;NA;8;2
-"libellen";"Gevlekte witsnuitlibel";"aantal tellingen";51;51;52;46
-"libellen";"Gevlekte witsnuitlibel";"aantal tellers";13;15;16;16
-"libellen";"Hoogveenglanslibel";"aantal tellingen";NA;NA;23;18
-"libellen";"Hoogveenglanslibel";"aantal tellers";NA;NA;10;6
-"libellen";"Kempense heidelibel";"aantal tellingen";15;14;16;3
-"libellen";"Kempense heidelibel";"aantal tellers";7;6;7;2
-"libellen";"Maanwaterjuffer";"aantal tellingen";19;18;15;16
-"libellen";"Maanwaterjuffer";"aantal tellers";5;7;6;6
-"libellen";"Rivierrombout";"aantal tellingen";65;71;58;52
-"libellen";"Rivierrombout";"aantal tellers";11;14;11;9
-"libellen";"Speerwaterjuffer";"aantal tellingen";NA;14;13;7
-"libellen";"Speerwaterjuffer";"aantal tellers";NA;7;6;4
-"libellen";"Variabele waterjuffer";"aantal tellingen";NA;27;28;10
-"libellen";"Variabele waterjuffer";"aantal tellers";NA;13;9;5
-"libellen";"Vroege glazenmaker";"aantal tellingen";NA;30;28;9
-"libellen";"Vroege glazenmaker";"aantal tellers";NA;12;12;3
-"mollusken";"Zeggekorfslak";"aantal tellingen";NA;NA;2;NA
-"mollusken";"Zeggekorfslak";"aantal tellers";NA;NA;2;NA
-"overige";"Gerande oeverspin";"aantal tellingen";NA;12;NA;10
-"overige";"Gerande oeverspin";"aantal tellers";NA;3;NA;6
-"overige";"Lentevuurspin";"aantal tellingen";3;3;3;NA
-"overige";"Lentevuurspin";"aantal tellers";2;1;1;NA
-"overige";"Roestbruine kniptor";"aantal tellingen";NA;NA;49;35
-"overige";"Roestbruine kniptor";"aantal tellers";NA;NA;15;9
-"overige";"Vliegend hert";"aantal tellingen";NA;18;12;NA
-"overige";"Vliegend hert";"aantal tellers";NA;7;7;NA
-"overige";"Zadelsprinkhaan";"aantal tellingen";9;12;9;3
-"overige";"Zadelsprinkhaan";"aantal tellers";3;3;4;2
-"planten";"Bleekgeel blaasjeskruid";"aantal tellingen";1;1;NA;NA
-"planten";"Bleekgeel blaasjeskruid";"aantal tellers";1;1;NA;NA
-"planten";"Driekantige bies";"aantal tellingen";6;4;5;5
-"planten";"Driekantige bies";"aantal tellers";3;1;1;1
-"planten";"Duingentiaan";"aantal tellingen";5;7;NA;7
-"planten";"Duingentiaan";"aantal tellers";1;3;NA;3
-"planten";"Fijn goudscherm";"aantal tellingen";NA;2;NA;NA
-"planten";"Fijn goudscherm";"aantal tellers";NA;2;NA;NA
-"planten";"Gesteelde zoutmelde";"aantal tellingen";NA;1;NA;NA
-"planten";"Gesteelde zoutmelde";"aantal tellers";NA;2;NA;NA
-"planten";"Grote bremraap";"aantal tellingen";19;15;13;9
-"planten";"Grote bremraap";"aantal tellers";7;7;4;4
-"planten";"Harlekijn";"aantal tellingen";2;NA;NA;2
-"planten";"Harlekijn";"aantal tellers";2;NA;NA;2
-"planten";"Honingorchis";"aantal tellingen";4;4;3;NA
-"planten";"Honingorchis";"aantal tellers";1;2;1;NA
-"planten";"Kleine schorseneer";"aantal tellingen";3;3;NA;4
-"planten";"Kleine schorseneer";"aantal tellers";3;2;NA;3
-"planten";"Kleine wolfsklauw";"aantal tellingen";2;4;NA;2
-"planten";"Kleine wolfsklauw";"aantal tellers";1;2;NA;1
-"planten";"Klimopklokje";"aantal tellingen";5;5;2;2
-"planten";"Klimopklokje";"aantal tellers";3;5;1;2
-"planten";"Koprus";"aantal tellingen";4;1;NA;1
-"planten";"Koprus";"aantal tellers";1;1;NA;1
-"planten";"Krabbenscheer";"aantal tellingen";4;2;NA;1
-"planten";"Krabbenscheer";"aantal tellers";2;1;NA;1
-"planten";"Moerassmele";"aantal tellingen";2;2;1;NA
-"planten";"Moerassmele";"aantal tellers";2;2;1;NA
-"planten";"Plat fonteinkruid";"aantal tellingen";3;4;2;NA
-"planten";"Plat fonteinkruid";"aantal tellers";2;3;2;NA
-"planten";"Polei";"aantal tellingen";5;2;NA;NA
-"planten";"Polei";"aantal tellers";1;1;NA;NA
-"planten";"Purperorchis";"aantal tellingen";8;1;3;8
-"planten";"Purperorchis";"aantal tellers";4;1;1;4
-"planten";"Ronde zegge";"aantal tellingen";7;7;6;1
-"planten";"Ronde zegge";"aantal tellers";4;4;5;1
-"planten";"Slank wollegras";"aantal tellingen";3;1;2;4
-"planten";"Slank wollegras";"aantal tellers";1;1;2;2
-"planten";"Spits fonteinkruid";"aantal tellingen";11;7;7;3
-"planten";"Spits fonteinkruid";"aantal tellers";4;8;6;1
-"planten";"Stekende bies";"aantal tellingen";1;1;2;NA
-"planten";"Stekende bies";"aantal tellers";1;1;1;NA
-"planten";"Veenmosorchis";"aantal tellingen";4;1;1;NA
-"planten";"Veenmosorchis";"aantal tellers";1;1;1;NA
-"planten";"Weegbreefonteinkruid";"aantal tellingen";1;8;3;1
-"planten";"Weegbreefonteinkruid";"aantal tellers";1;4;3;1
-"planten";"Welriekende nachtorchis";"aantal tellingen";16;3;2;8
-"planten";"Welriekende nachtorchis";"aantal tellers";7;3;2;3
-"planten";"Witte waterranonkel";"aantal tellingen";27;8;15;14
-"planten";"Witte waterranonkel";"aantal tellers";11;4;6;8
-"vogels";"Algemene Broedvogelmonitoring (ABV)";"aantal tellingen";563;571;542;526
-"vogels";"Algemene Broedvogelmonitoring (ABV)";"aantal tellers";156;154;150;142
-"zoogdieren";"Hazelmuis";"aantal tellingen";35;33;32;NA
-"zoogdieren";"Hazelmuis";"aantal tellers";9;9;5;NA
+soortgroep,meetnet,monitoringsinspanning,2016,2017,2018,2019
+amfibieÃ«n,Boomkikker,aantal tellingen,106,107,99,48
+amfibieÃ«n,Boomkikker,aantal tellers,8,7,9,5
+amfibieÃ«n,Kamsalamander,aantal tellingen,NA,105,124,162
+amfibieÃ«n,Kamsalamander,aantal tellers,NA,15,17,11
+amfibieÃ«n,Knoflookpad,aantal tellingen,NA,12,15,22
+amfibieÃ«n,Knoflookpad,aantal tellers,NA,2,7,4
+amfibieÃ«n,Rugstreeppad,aantal tellingen,NA,NA,38,42
+amfibieÃ«n,Rugstreeppad,aantal tellers,NA,NA,4,12
+amfibieÃ«n,Vuursalamander,aantal tellingen,86,107,96,54
+amfibieÃ«n,Vuursalamander,aantal tellers,45,49,48,37
+dagvlinders,Aardbeivlinder,aantal tellingen,NA,20,23,11
+dagvlinders,Aardbeivlinder,aantal tellers,NA,7,10,5
+dagvlinders,Algemene Vlindermonitoring,aantal tellingen,116,103,41,39
+dagvlinders,Algemene Vlindermonitoring,aantal tellers,7,6,4,5
+dagvlinders,Argusvlinder,aantal tellingen,105,83,52,48
+dagvlinders,Argusvlinder,aantal tellers,16,15,11,11
+dagvlinders,Bruin dikkopje,aantal tellingen,NA,22,25,15
+dagvlinders,Bruin dikkopje,aantal tellers,NA,5,5,3
+dagvlinders,Bruine eikenpage,aantal tellingen,NA,NA,36,23
+dagvlinders,Bruine eikenpage,aantal tellers,NA,NA,8,6
+dagvlinders,Gentiaanblauwtje,aantal tellingen,16,16,17,4
+dagvlinders,Gentiaanblauwtje,aantal tellers,6,7,8,6
+dagvlinders,Grote weerschijnvlinder,aantal tellingen,NA,NA,22,21
+dagvlinders,Grote weerschijnvlinder,aantal tellers,NA,NA,5,5
+dagvlinders,Heivlinder,aantal tellingen,71,23,38,33
+dagvlinders,Heivlinder,aantal tellers,29,12,13,12
+dagvlinders,Klaverblauwtje,aantal tellingen,NA,6,8,6
+dagvlinders,Klaverblauwtje,aantal tellers,NA,1,2,1
+dagvlinders,Kommavlinder,aantal tellingen,32,30,40,43
+dagvlinders,Kommavlinder,aantal tellers,14,12,11,13
+dagvlinders,Oranje zandoogje,aantal tellingen,NA,47,34,30
+dagvlinders,Oranje zandoogje,aantal tellers,NA,18,13,61
+dagvlinders,Veldparelmoervlinder,aantal tellingen,31,33,34,15
+dagvlinders,Veldparelmoervlinder,aantal tellers,10,14,11,7
+libellen,Beekrombout,aantal tellingen,NA,NA,NA,9
+libellen,Beekrombout,aantal tellers,NA,NA,NA,6
+libellen,Bosbeekjuffer,aantal tellingen,NA,NA,27,7
+libellen,Bosbeekjuffer,aantal tellers,NA,NA,8,2
+libellen,Gevlekte witsnuitlibel,aantal tellingen,51,51,52,46
+libellen,Gevlekte witsnuitlibel,aantal tellers,13,15,16,16
+libellen,Hoogveenglanslibel,aantal tellingen,NA,NA,23,18
+libellen,Hoogveenglanslibel,aantal tellers,NA,NA,10,6
+libellen,Kempense heidelibel,aantal tellingen,15,14,16,3
+libellen,Kempense heidelibel,aantal tellers,7,6,7,2
+libellen,Maanwaterjuffer,aantal tellingen,19,18,15,16
+libellen,Maanwaterjuffer,aantal tellers,5,7,6,6
+libellen,Rivierrombout,aantal tellingen,65,71,58,52
+libellen,Rivierrombout,aantal tellers,11,14,11,9
+libellen,Speerwaterjuffer,aantal tellingen,NA,14,13,7
+libellen,Speerwaterjuffer,aantal tellers,NA,7,6,4
+libellen,Variabele waterjuffer,aantal tellingen,NA,27,28,10
+libellen,Variabele waterjuffer,aantal tellers,NA,13,9,5
+libellen,Vroege glazenmaker,aantal tellingen,NA,30,28,9
+libellen,Vroege glazenmaker,aantal tellers,NA,12,12,3
+mollusken,Zeggekorfslak,aantal tellingen,NA,NA,2,NA
+mollusken,Zeggekorfslak,aantal tellers,NA,NA,2,NA
+overige,Gerande oeverspin,aantal tellingen,NA,12,NA,10
+overige,Gerande oeverspin,aantal tellers,NA,3,NA,6
+overige,Lentevuurspin,aantal tellingen,3,3,3,NA
+overige,Lentevuurspin,aantal tellers,2,1,1,NA
+overige,Roestbruine kniptor,aantal tellingen,NA,NA,49,35
+overige,Roestbruine kniptor,aantal tellers,NA,NA,15,9
+overige,Vliegend hert,aantal tellingen,NA,18,12,NA
+overige,Vliegend hert,aantal tellers,NA,7,7,NA
+overige,Zadelsprinkhaan,aantal tellingen,9,12,9,3
+overige,Zadelsprinkhaan,aantal tellers,3,3,4,2
+planten,Bleekgeel blaasjeskruid,aantal tellingen,1,1,NA,NA
+planten,Bleekgeel blaasjeskruid,aantal tellers,1,1,NA,NA
+planten,Driekantige bies,aantal tellingen,6,4,5,5
+planten,Driekantige bies,aantal tellers,3,1,1,1
+planten,Duingentiaan,aantal tellingen,5,7,NA,7
+planten,Duingentiaan,aantal tellers,1,3,NA,3
+planten,Fijn goudscherm,aantal tellingen,NA,2,NA,NA
+planten,Fijn goudscherm,aantal tellers,NA,2,NA,NA
+planten,Gesteelde zoutmelde,aantal tellingen,NA,1,NA,NA
+planten,Gesteelde zoutmelde,aantal tellers,NA,2,NA,NA
+planten,Grote bremraap,aantal tellingen,19,15,13,9
+planten,Grote bremraap,aantal tellers,7,7,4,4
+planten,Harlekijn,aantal tellingen,2,NA,NA,2
+planten,Harlekijn,aantal tellers,2,NA,NA,2
+planten,Honingorchis,aantal tellingen,4,4,3,NA
+planten,Honingorchis,aantal tellers,1,2,1,NA
+planten,Kleine schorseneer,aantal tellingen,3,3,NA,4
+planten,Kleine schorseneer,aantal tellers,3,2,NA,3
+planten,Kleine wolfsklauw,aantal tellingen,2,4,NA,2
+planten,Kleine wolfsklauw,aantal tellers,1,2,NA,1
+planten,Klimopklokje,aantal tellingen,5,5,2,2
+planten,Klimopklokje,aantal tellers,3,5,1,2
+planten,Koprus,aantal tellingen,4,1,NA,1
+planten,Koprus,aantal tellers,1,1,NA,1
+planten,Krabbenscheer,aantal tellingen,4,2,NA,1
+planten,Krabbenscheer,aantal tellers,2,1,NA,1
+planten,Moerassmele,aantal tellingen,2,2,1,NA
+planten,Moerassmele,aantal tellers,2,2,1,NA
+planten,Plat fonteinkruid,aantal tellingen,3,4,2,NA
+planten,Plat fonteinkruid,aantal tellers,2,3,2,NA
+planten,Polei,aantal tellingen,5,2,NA,NA
+planten,Polei,aantal tellers,1,1,NA,NA
+planten,Purperorchis,aantal tellingen,8,1,3,8
+planten,Purperorchis,aantal tellers,4,1,1,4
+planten,Ronde zegge,aantal tellingen,7,7,6,1
+planten,Ronde zegge,aantal tellers,4,4,5,1
+planten,Slank wollegras,aantal tellingen,3,1,2,4
+planten,Slank wollegras,aantal tellers,1,1,2,2
+planten,Spits fonteinkruid,aantal tellingen,11,7,7,3
+planten,Spits fonteinkruid,aantal tellers,4,8,6,1
+planten,Stekende bies,aantal tellingen,1,1,2,NA
+planten,Stekende bies,aantal tellers,1,1,1,NA
+planten,Veenmosorchis,aantal tellingen,4,1,1,NA
+planten,Veenmosorchis,aantal tellers,1,1,1,NA
+planten,Weegbreefonteinkruid,aantal tellingen,1,8,3,1
+planten,Weegbreefonteinkruid,aantal tellers,1,4,3,1
+planten,Welriekende nachtorchis,aantal tellingen,16,3,2,8
+planten,Welriekende nachtorchis,aantal tellers,7,3,2,3
+planten,Witte waterranonkel,aantal tellingen,27,8,15,14
+planten,Witte waterranonkel,aantal tellers,11,4,6,8
+vogels,Algemene Broedvogelmonitoring (ABV),aantal tellingen,563,571,542,526
+vogels,Algemene Broedvogelmonitoring (ABV),aantal tellers,156,154,150,142
+zoogdieren,Hazelmuis,aantal tellingen,35,33,32,NA
+zoogdieren,Hazelmuis,aantal tellers,9,9,5,NA
