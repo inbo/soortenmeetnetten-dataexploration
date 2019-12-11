@@ -1,0 +1,47 @@
+# Amfibieën
+
+```{r}
+sg <- "amfibieën"
+```
+
+## Overzicht monitoringsinspanning
+
+```{r}
+
+overzicht_bezoeken_tellers %>%
+  filter(soortgroep == sg) %>%
+  select(-soortgroep) %>%
+  kable() %>%
+  kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
+  collapse_rows(1)
+
+```
+
+## Getelde aantallen
+
+### Primaire soorten
+
+```{r}
+
+overzicht_aantallen_levensvorm_primair_wide %>%
+  filter(soortgroep == sg) %>%
+  select(-soortgroep, -soort_nl) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("hover", "condensed")) %>%
+    collapse_rows(c(1,2,3))
+  
+```
+
+### Overige soorten
+
+```{r}
+overzicht_aantallen_levensvorm_overige_wide %>%
+  mutate(soort_nl = ifelse(soort_wet == "Pelophylax esculenta synklepton",
+                           "groene-kikker-complex", soort_nl)) %>%
+  filter(soortgroep == sg) %>%
+  select(-soortgroep) %>%
+  kable() %>%
+  kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
+    collapse_rows(c(1,2,3))
+```
+

@@ -1,0 +1,66 @@
+
+```{r banner, fig.width= 9, cache= FALSE}
+include_graphics("../images/emailbanner_meetnetten.jpg", dpi = 150)
+```
+
+
+# Data
+
+```{r}
+versie <- "versie2019-12-11"
+```
+
+We maken gebruik van een export uit de meetnetten-databank met ingevoerde gegevens t.e.m. `r versie`.
+
+```{r data import}
+bezoeken <- read.csv2(paste("../data/", versie, "/bezoeken.csv", sep = ""), stringsAsFactors = FALSE)
+aantallen <- read.csv2(paste("../data/", versie, "/aantallen.csv", sep = ""), stringsAsFactors = FALSE)
+werkpakketten <- read.csv2(paste("../data/", versie, "/werkpakketten.csv", sep = ""), stringsAsFactors = FALSE)
+
+locaties <- st_read(paste("../data/", versie, "/meetnetten_locaties.gpkg", sep = ""),
+                    "locaties", quiet = TRUE)
+transecten <- st_read(paste("../data/", versie, "/meetnetten_locaties.gpkg", sep = ""),
+                    "transecten", quiet = TRUE)
+
+transecten_length <- transecten %>%
+  st_transform(crs = 31370) %>%
+  mutate(lengte = st_length(transecten)) %>%
+  select(meetnet, locatie, sublocatie, lengte) %>%
+  st_drop_geometry()
+  
+bezoeken <- bezoeken %>%
+  mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
+         jaar = as.numeric(format(datum, "%Y")),
+         doy = as.numeric(format(datum, "%j"))) %>%
+  group_by(meetnet, protocol, locatie, jaar) %>%
+  mutate(i_bezoek = rank(doy)) %>%
+  ungroup() %>%
+  select(soortgroep, meetnet, protocol, locatie, jaar, datum, doy, i_bezoek, everything())
+
+aantallen <- aantallen %>%
+  mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
+         jaar = as.numeric(format(datum, "%Y")),
+         doy = as.numeric(format(datum, "%j"))) %>%
+  select(soortgroep, meetnet, protocol, locatie, jaar, datum, doy, everything())
+
+werkpakketten <- werkpakketten %>%
+  mutate(wp_start = as.Date(wp_start, format = "%Y-%m-%d"),
+         wp_end = as.Date(wp_end,  format = "%Y-%m-%d"),
+         doy_min = as.numeric(format(wp_start, "%j")),
+         doy_max = as.numeric(format(wp_end, "%j")),
+         doy_mid = doy_min + round((doy_max - doy_min)/2, 0))
+
+
+tellers_orig <- read.csv2(paste("../data/", versie, "/tellers.csv", sep = ""), stringsAsFactors = FALSE)
+
+tellers <- tellers_orig %>%
+  mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
+         jaar = as.numeric(format(datum, "%Y")),
+         doy = as.numeric(format(datum, "%j"))) %>%
+  gather(hoofdteller, medeteller, key = "type_teller", value = "naam_teller") %>%
+  filter(naam_teller != "")
+
+```
+
+
+
