@@ -14,20 +14,24 @@ overzicht_tellers <- tellers %>%
 overzicht_bezoeken_tellers <- bind_rows(
   overzicht_bezoeken %>%
     filter(jaar >= 2016) %>%
-    spread(key = jaar, value = n_tellingen, fill = 0) %>%
+    spread(key = jaar, value = n_tellingen) %>%
     mutate(monitoringsinspanning = "aantal tellingen"),
   overzicht_tellers %>%
     filter(jaar >= 2016) %>%
-    spread(key = jaar, value = n_tellers, fill = 0) %>%
+    spread(key = jaar, value = n_tellers) %>%
     mutate(monitoringsinspanning = "aantal tellers")
   ) %>%
   arrange(soortgroep, meetnet) %>%
   select(soortgroep, meetnet, monitoringsinspanning, everything())
   
+write.csv2(overzicht_bezoeken_tellers,
+           str_c("../output/monitoringsinspanning_", versie, ".csv"),
+           row.names = FALSE)
+
 ```
 
 
-```{r}
+```{r aantallenMeetnet}
 
 aantallen_bezoek <- aantallen %>%
   group_by(soortgroep, meetnet, protocol, locatie, visit_id, jaar, datum, soort_nl, soort_wet, primaire_soort, geslacht, activiteit, levensstadium) %>%
@@ -48,20 +52,21 @@ overzicht_aantallen_primair <- aantallen_bezoek %>%
 overzicht_aantallen_primair_wide <- overzicht_aantallen_primair %>%
   select(-bezoeken) %>%
   gather(totaal, gemiddeld, key = "aantal", value = "waarde") %>%
-  spread(key = "jaar", value = "waarde", fill = 0)
+  spread(key = "jaar", value = "waarde")
 
 overzicht_aantallen_levensvorm_primair <- aantallen_bezoek %>%
   filter(primaire_soort) %>%
   group_by(soortgroep, meetnet, jaar, soort_nl, soort_wet,levensstadium) %>%
   summarise(totaal = sum(aantal),
             gemiddeld = round(mean(aantal),1),
+            maximum = max(aantal),
             bezoeken = n()) %>%
   ungroup()
   
 overzicht_aantallen_levensvorm_primair_wide <- overzicht_aantallen_levensvorm_primair %>%
   select(-bezoeken) %>%
-  gather(totaal, gemiddeld, key = "aantal", value = "waarde") %>%
-  spread(key = "jaar", value = "waarde", fill = 0)
+  gather(totaal, gemiddeld, maximum, key = "aantal", value = "waarde") %>%
+  spread(key = "jaar", value = "waarde")
 
 overzicht_aantallen_overige <- aantallen_bezoek %>%
   filter(!primaire_soort) %>%
@@ -81,6 +86,26 @@ overzicht_aantallen_levensvorm_overige <- aantallen_bezoek %>%
 overzicht_aantallen_levensvorm_overige_wide <- overzicht_aantallen_levensvorm_overige %>%
   spread(key = "jaar", value = "totaal", fill = 0)
 
+write.csv2(overzicht_aantallen_levensvorm_primair_wide,
+           str_c("../output/aantallen_primair_", versie, ".csv"),
+           row.names = FALSE)
+
+write.csv2(overzicht_aantallen_levensvorm_overige_wide,
+           str_c("../output/aantallen_overige_", versie, ".csv"),
+           row.names = FALSE)
+
+```
+
+```{r}
+aantallen_bezoek_levensvorm <- aantallen %>%
+  group_by(soortgroep, meetnet, protocol, locatie, visit_id, jaar, datum, doy, soort_nl, soort_wet, primaire_soort, levensstadium) %>%
+  summarise(aantal = sum(aantal, na.rm = TRUE),
+            n_subsamples = n(),
+            maximum = max(aantal, na.rm = TRUE)) %>%
+  ungroup() %>%
+  mutate(soort_stadium = str_c(soort_nl, levensstadium, sep = " "))
+  
+  
 ```
 
 
