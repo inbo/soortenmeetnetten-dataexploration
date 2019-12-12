@@ -14,6 +14,7 @@ output:
     toc_float:
       collapsed: FALSE
       smooth_scroll: FALSE
+    number_sections: FALSE
   bookdown::gitbook:
     split_by: "chapter+number"
     template: !expr INBOmd::inbo_rapport_css("html")
@@ -30,7 +31,7 @@ options(knitr.kable.NA = '')
 opts_chunk$set(
   echo = FALSE, 
   eval = TRUE,
-  cache = TRUE,
+  cache = FALSE,
   warning = TRUE,
   error = TRUE,
   message = TRUE
