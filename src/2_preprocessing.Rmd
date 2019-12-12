@@ -1,3 +1,6 @@
+# Resultaten van de dataverkenning
+
+
 
 ```{r monitoringsinspanning}
 
@@ -24,9 +27,8 @@ overzicht_bezoeken_tellers <- bind_rows(
   arrange(soortgroep, meetnet) %>%
   select(soortgroep, meetnet, monitoringsinspanning, everything())
   
-write.csv2(overzicht_bezoeken_tellers,
-           str_c("../output/monitoringsinspanning_", versie, ".csv"),
-           row.names = FALSE)
+# write.csv2(overzicht_bezoeken_tellers,
+#            str_c("../output/monitoringsinspanning_", versie, ".csv"))
 
 ```
 
@@ -86,13 +88,13 @@ overzicht_aantallen_levensvorm_overige <- aantallen_bezoek %>%
 overzicht_aantallen_levensvorm_overige_wide <- overzicht_aantallen_levensvorm_overige %>%
   spread(key = "jaar", value = "totaal", fill = 0)
 
-write.csv2(overzicht_aantallen_levensvorm_primair_wide,
-           str_c("../output/aantallen_primair_", versie, ".csv"),
-           row.names = FALSE)
-
-write.csv2(overzicht_aantallen_levensvorm_overige_wide,
-           str_c("../output/aantallen_overige_", versie, ".csv"),
-           row.names = FALSE)
+# write.csv2(overzicht_aantallen_levensvorm_primair_wide,
+#            str_c("../output/aantallen_primair_", versie, ".csv"),
+#            row.names = FALSE)
+# 
+# write.csv2(overzicht_aantallen_levensvorm_overige_wide,
+#            str_c("../output/aantallen_overige_", versie, ".csv"),
+#            row.names = FALSE)
 
 ```
 
@@ -107,5 +109,91 @@ aantallen_bezoek_levensvorm <- aantallen %>%
   
   
 ```
+
+## Overzichtstabellen
+
+Op basis van deze gegevens maken we volgende overzichtstabellen:
+
+* [monitoringsinspanning uitgedrukt in aantal tellingen en aantal tellers](https://drive.google.com/open?id=12esd_jLVPH_a6ENJaaCHleI1AM6DdnUTjGReD0nqL0U)
+
+* [totaal, gemiddeld en maximum getelde aantallen voor de primaire soorten](https://drive.google.com/open?id=1sTN0v6TF7iRYuL_D6L7XX4JCA2DDwPRJuj3-fxUiOSU)
+
+*  [totaal getelde aantallen voor de overige soorten](https://drive.google.com/open?id=16XZt8iS7k5DqzjTDpFGxTAFZHvPRzlkoBQBjcsWaJ_o)
+
+## Figuren
+
+Daarnaast vind je op deze website per meetnet een aantal figuren met de getelde aantallen per bezoek. Een 
+
+Een eerste figuur geeft de evolutie van de getelde aantallen binnen het seizoen weer en dit voor elk jaar waarin er geteld werd. Onderstaand voorbeeld toont het getelde aantal Boomkikker adulten. De stippelijnen verbinden tellingen van eenzelfde locatie. Op basis hiervan krijg je een idee hoe de getelde aantallen binnen een telseizoen variëren.     
+
+```{r voorbeeldfiguur1, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+soort <- "Boomkikker"
+stadium <- "adult"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort & levensstadium == stadium ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_stadium ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+```
+
+Indien er veel tellocaties zijn, is het moeilijk om nog een patroon te herkennen in bovenstaande figuur. Daarom tonen we ook onderstaande figuur waarin de blauwe lijn de gemiddelde evolutie toont binnen het telseizoen en de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie. Een dergelijke figuur vraagt een minimum aantal telgegevens en daarom is het niet mogelijk om deze figuur voor alle soorten te maken.  
+
+```{r voorbeeldfiguur2, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+ q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_stadium ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  ylim(0, max_soort_stadium) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+Ten slotte tonen we ook een figuur met het gemiddeld aantal getelde individuen per jaar (rode bollen) en het 95%-betrouwbaarheidsinterval hierop (rode verticale strepen). Op basis hiervan kunnen de gemiddelde aantallen tussen verschillende jaren vergeleken worden. Indien de betrouwbaarheidsintervallen van verschillende jaren niet overlappen, kunnen we vrij zeker zijn dat er werkelijk een verschil is in populatiegrootte.     
+
+```{r voorbeeldfiguur3, fig.height= 3, fig.width= 7}
+
+soort <- "Boomkikker"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
 
 

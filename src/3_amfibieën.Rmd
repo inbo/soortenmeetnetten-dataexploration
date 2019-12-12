@@ -49,14 +49,13 @@ overzicht_aantallen_levensvorm_overige_wide %>%
 
 ### Boomkikker
 
-#### Evolutie getelde aantallen binnen telperiode
-
-Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
-
-```{r boomkikkerAdult, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
-
+```{r}
 soort <- "Boomkikker"
 stadium <- "adult"
+```
+
+
+```{r boomkikkerAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -95,10 +94,12 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  
 ```
 
-```{r boomkikkerLarve, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
-
+```{r}
 soort <- "Boomkikker"
 stadium <- "larve"
+```
+
+```{r boomkikkerLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -138,13 +139,7 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-#### Evolutie gemiddelde aantallen per jaar
-
-Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
-
-```{r boomkikkerMean, fig.height= 3, fig.width= 7}
-
-soort <- "Boomkikker"
+```{r boomkikkerMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 7}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -165,14 +160,13 @@ aantallen_soort_stadium %>%
 
 ### Knoflookpad
 
-#### Evolutie getelde aantallen binnen telperiode
 
-Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
-
-```{r knoflookpadAdult, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
-
+```{r}
 soort <- "Knoflookpad"
 stadium <- "adult"
+```
+
+```{r knoflookpadAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -198,10 +192,15 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  
 ```
 
-```{r knoflookpadLarve, message=FALSE, warning= FALSE, fig.width= 3, fig.height= 3}
 
+```{r}
 soort <- "Knoflookpad"
 stadium <- "larve"
+
+```
+
+
+```{r knoflookpadLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 3, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -228,13 +227,7 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-#### Evolutie gemiddelde aantallen per jaar
-
-Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
-
-```{r knoflookpadMean, fig.height= 3, fig.width= 6}
-
-soort <- "Knoflookpad"
+```{r knoflookpadMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 6}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -256,11 +249,12 @@ aantallen_soort_stadium %>%
 
 ### Rugstreeppad
 
-#### Evolutie getelde aantallen binnen telperiode
+```{r}
+soort <- "Rugstreeppad"
+stadium <- "adult"
+```
 
-Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
-
-```{r rugstreeppadAdult, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+```{r rugstreeppadAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
 soort <- "Rugstreeppad"
 stadium <- "adult"
@@ -303,10 +297,12 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  
 ```
 
-```{r rugstreeppadJuveniel, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
-
+```{r}
 soort <- "Rugstreeppad"
 stadium <- "juveniel"
+```
+
+```{r rugstreeppadJuveniel, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -332,10 +328,12 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  
 ```
 
-```{r rugstreeppadEi, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
-
+```{r}
 soort <- "Rugstreeppad"
 stadium <- "ei"
+```
+
+```{r rugstreeppadEi, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -363,10 +361,13 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-```{r rugstreeppadLarve, message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
-
+```{r}
 soort <- "Rugstreeppad"
 stadium <- "larve"
+```
+
+
+```{r rugstreeppadLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -393,13 +394,7 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-#### Evolutie gemiddelde aantallen per jaar
-
-Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
-
-```{r rugstreeppadMean, fig.height= 5, fig.width= 6}
-
-soort <- "Rugstreeppad"
+```{r rugstreeppadMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 5, fig.width= 6}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -421,14 +416,12 @@ aantallen_soort_stadium %>%
 
 ### Kamsalamander
 
-#### Evolutie getelde aantallen binnen telperiode
-
-Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
-
-```{r kamsalamanderAdult, message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
-
+```{r}
 soort <- "Kamsalamander"
 stadium <- "adult"
+```
+
+```{r kamsalamanderAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -467,10 +460,15 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  
 ```
 
-```{r kamsalamanderLarve, message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
+```{r}
 
 soort <- "Kamsalamander"
 stadium <- "larve"
+
+```
+
+
+```{r kamsalamanderLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -497,14 +495,7 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  
 ```
 
-
-#### Evolutie gemiddelde aantallen per jaar
-
-Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
-
-```{r kamsalamanderMean, fig.height= 5, fig.width= 6}
-
-soort <- "Kamsalamander"
+```{r kamsalamanderMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 5, fig.width= 6}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -525,14 +516,15 @@ aantallen_soort_stadium %>%
 
 ### Vuursalamander
 
-#### Evolutie getelde aantallen binnen telperiode
 
-Onderstaande figuren geven de evolutie van de getelde aantallen binnen het seizoen. De stippelijnen verbinden tellingen van eenzelfde locatie. De blauwe lijn toont de gemiddelde evolutie binnen het seizoen, waarbij de grijze banden aan beide kanten van de blauwe lijn de onzekerheid aangeven op deze gemiddelde evolutie.
-
-```{r vuursalamanderPostmetamorf, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
-
+```{r}
 soort <- "Vuursalamander"
 stadium <- "post-metamorf"
+
+```
+
+```{r vuursalamanderPostmetamorf, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -573,13 +565,8 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-#### Evolutie gemiddelde aantallen per jaar
+```{r vuursalamanderMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 4, fig.width= 4}
 
-Onderstaande figuur toont het gemiddeld aantal getelde individuen per jaar met 95%-betrouwbaarheidsinterval (rode bollen) en aantal getelde individuen per bezoek (grijze bollen).
-
-```{r vuursalamanderMean, fig.height= 4, fig.width= 4}
-
-soort <- "Vuursalamander"
 
 aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
    filter(primaire_soort) %>%
@@ -598,4 +585,4 @@ aantallen_soort_stadium %>%
 ```
 
 
-# To be continued
+# To be continued voor andere soortengroepen

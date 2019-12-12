@@ -8,6 +8,7 @@ versie <- "versie2019-12-11"
 
 We maken gebruik van een export uit de meetnetten-databank met ingevoerde gegevens t.e.m. `r versie`.
 
+
 ```{r data import}
 bezoeken <- read.csv2(paste("../data/", versie, "/bezoeken.csv", sep = ""), stringsAsFactors = FALSE)
 aantallen <- read.csv2(paste("../data/", versie, "/aantallen.csv", sep = ""), stringsAsFactors = FALSE)
