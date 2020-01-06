@@ -17,7 +17,7 @@ overzicht_bezoeken_tellers %>%
 
 ```
 
-## Overzicht getelde aantallen
+## Overzicht getelde aantallen {.tabset}
 
 ### Primaire soorten
 
@@ -45,7 +45,7 @@ overzicht_aantallen_levensvorm_overige_wide %>%
     collapse_rows(c(1,2,3))
 ```
 
-## Verkenning getelde aantallen
+## Verkenning getelde aantallen {.tabset}
 
 ### Boomkikker
 

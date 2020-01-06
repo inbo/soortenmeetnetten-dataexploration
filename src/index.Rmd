@@ -15,6 +15,7 @@ output:
       collapsed: FALSE
       smooth_scroll: FALSE
     number_sections: FALSE
+    split_by: "chapter+number"
   bookdown::gitbook:
     split_by: "chapter+number"
     template: !expr INBOmd::inbo_rapport_css("html")
