@@ -41,6 +41,7 @@ library(tidyverse)
 library(INBOtheme)
 library(sf)
 library(kableExtra)
+library(DT)
 
 # theme_set(
 #   theme_inbo(
