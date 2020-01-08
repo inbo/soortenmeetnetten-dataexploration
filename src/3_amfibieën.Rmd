@@ -28,7 +28,8 @@ overzicht_aantallen_levensvorm_primair_wide %>%
   select(-soortgroep, -soort_nl) %>%
   kable() %>%
   kable_styling(bootstrap_options = c("hover", "condensed")) %>%
-    collapse_rows(c(1,2,3))
+    collapse_rows(c(1,2,3)) %>%
+  scroll_box(width = "100%", height = "600px")
   
 ```
 
@@ -42,7 +43,8 @@ overzicht_aantallen_levensvorm_overige_wide %>%
   select(-soortgroep) %>%
   kable() %>%
   kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
-    collapse_rows(c(1,2,3))
+    collapse_rows(c(1,2,3)) %>%
+  scroll_box(width = "100%", height = "600px")
 ```
 
 ## Verkenning getelde aantallen {.tabset}
@@ -585,4 +587,3 @@ aantallen_soort_stadium %>%
 ```
 
 
-# To be continued voor andere soortengroepen

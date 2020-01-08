@@ -1,0 +1,57 @@
+# Download
+
+## Overzicht monitoringsinspanning
+
+```{r}
+
+overzicht_bezoeken_tellers %>%
+  select(-soortgroep) %>%
+  datatable(rownames = FALSE,
+            filter = 'top',
+            extensions = 'Buttons', 
+            options = list(
+              dom = 'Bfrtip',
+              buttons = c('copy', 'pdf', 'csv', 'excel'),
+              language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Dutch.json')
+              )
+            )
+
+```
+
+## Overzicht getelde aantallen {.tabset}
+
+### Primaire soorten
+
+```{r}
+
+overzicht_aantallen_levensvorm_primair_wide %>%
+  select(-soortgroep, -soort_nl) %>%
+  datatable(rownames = FALSE,
+            filter = 'top',
+            extensions = 'Buttons', 
+            options = list(
+              dom = 'Bfrtip',
+              buttons = c('copy', 'pdf', 'csv', 'excel'),
+              language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Dutch.json')
+              )
+            )
+  
+```
+
+### Overige soorten
+
+```{r}
+overzicht_aantallen_levensvorm_overige_wide %>%
+  mutate(soort_nl = ifelse(soort_wet == "Pelophylax esculenta synklepton",
+                           "groene-kikker-complex", soort_nl)) %>%
+  filter(soortgroep == sg) %>%
+  datatable(rownames = FALSE,
+            filter = 'top',
+            extensions = 'Buttons', 
+            options = list(
+              dom = 'Bfrtip',
+              buttons = c('copy', 'pdf', 'csv', 'excel'),
+              language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Dutch.json')
+              )
+            )
+```

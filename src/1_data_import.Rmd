@@ -3,7 +3,7 @@
 # Data
 
 ```{r}
-versie <- "versie2019-12-11"
+versie <- "versie2020-01-06"
 ```
 
 We maken gebruik van een export uit de meetnetten-databank met ingevoerde gegevens t.e.m. `r versie`.
@@ -38,6 +38,7 @@ aantallen <- aantallen %>%
   mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
          jaar = as.numeric(format(datum, "%Y")),
          doy = as.numeric(format(datum, "%j"))) %>%
+  mutate(levensstadium = ifelse(levensstadium == "adult" & soortgroep == "libellen", "imago", levensstadium)) %>%
   select(soortgroep, meetnet, protocol, locatie, jaar, datum, doy, everything())
 
 werkpakketten <- werkpakketten %>%
