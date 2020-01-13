@@ -1,0 +1,131 @@
+# Kevers, spinnen en sprinkhanen
+
+```{r}
+sg <- "overige"
+```
+
+## Overzicht monitoringsinspanning
+
+```{r}
+
+overzicht_bezoeken_tellers %>%
+  arrange(soortgroep, meetnet) %>%
+  filter(soortgroep == sg) %>%
+  filter(meetnet != "Vliegend hert") %>%
+  select(-soortgroep) %>%
+  kable() %>%
+  kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
+  collapse_rows(1)
+
+```
+
+## Overzicht getelde aantallen
+
+```{r}
+
+overzicht_aantallen_levensvorm_primair_wide %>%
+  filter(soortgroep == sg) %>%
+  filter(meetnet != "Vliegend hert") %>%
+  arrange(soortgroep, meetnet) %>%
+  select( meetnet, soort_wet, levensstadium, aantal, "2016", "2017", "2018", "2019") %>%
+  # select(-soortgroep, -soort_nl) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("hover", "condensed")) %>%
+    collapse_rows(c(1,2)) %>%
+  scroll_box(width = "100%", height = "600px")
+  
+```
+
+
+## Verkenning getelde aantallen {.tabset}
+
+### Lentevuurspin
+
+```{r}
+soort <- "Lentevuurspin"
+
+```
+
+```{r Lentevuurspin, fig.cap= str_c("Evolutie getelde aantallen per locatie: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) 
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = jaar, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ # facet_grid(soort_nl ~ jaar) +
+  labs(x = "Jaar", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ 
+```
+
+
+```{r Lentevuurspingemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+### Zadelsprinkhaan
+
+```{r}
+soort <- "Zadelsprinkhaan"
+
+```
+
+```{r Zadelsprinkhaan, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+ 
+```
+
+
+```{r Zadelsprinkhaangemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+

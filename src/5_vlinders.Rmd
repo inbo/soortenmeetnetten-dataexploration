@@ -1,0 +1,696 @@
+# Vlinders
+
+```{r}
+sg <- "dagvlinders"
+```
+
+## Overzicht monitoringsinspanning
+
+```{r}
+
+overzicht_bezoeken_tellers %>%
+  filter(soortgroep == sg) %>%
+  select(-soortgroep) %>%
+  kable() %>%
+  kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
+  collapse_rows(1)
+
+```
+
+## Overzicht getelde aantallen {.tabset}
+
+### Primaire soorten
+
+```{r}
+
+overzicht_aantallen_levensvorm_primair_wide %>%
+  filter(soortgroep == sg) %>%
+  arrange(meetnet) %>%
+  select( meetnet, soort_wet, levensstadium, aantal, "2016", "2017", "2018", "2019") %>%
+  # select(-soortgroep, -soort_nl) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("hover", "condensed")) %>%
+    collapse_rows(c(1,2)) %>%
+  scroll_box(width = "100%", height = "600px")
+  
+```
+
+### Overige soorten
+
+```{r}
+overzicht_aantallen_overige_wide %>%
+  filter(soortgroep == sg) %>%
+  #filter(levensstadium != "larvenhuidje" | meetnet %in% c("Kommavlinder", "Oranje zandoogje")) %>%
+  arrange(soort_nl) %>%
+  select(soort_nl , soort_wet, levensstadium,  "2016", "2017", "2018", "2019") %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("hover", "condensed")) %>%
+    collapse_rows(c(1,2)) %>%
+  scroll_box(width = "100%", height = "600px")
+```
+
+## Verkenning getelde aantallen {.tabset}
+
+### Aardbeivlinder
+
+```{r}
+soort <- "Aardbeivlinder"
+
+```
+
+```{r Aardbeivlinder, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+```{r Aardbeivlindergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+### Argusvlinder
+
+```{r}
+soort <- "Argusvlinder"
+
+```
+
+```{r Argusvlinder, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+```{r Argusvlindergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+
+### Bruin dikkopje
+
+```{r}
+soort <- "Bruin dikkopje"
+
+```
+
+```{r Bruin dikkopje, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+```{r Bruin dikkopjegemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+
+### Bruine eikenpage
+
+```{r}
+soort <- "Bruine eikenpage"
+
+```
+
+```{r Bruineeikenpage, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+  
+```
+
+
+```{r Bruineeikenpagegemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+### Gentiaanblauwtje
+
+```{r}
+soort <- "Gentiaanblauwtje"
+
+```
+
+```{r Gentiaanblauwtje, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ 
+```
+
+
+```{r Gentiaanblauwtjegem, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+
+### Grote weerschijnvlinder
+
+```{r}
+soort <- "Grote weerschijnvlinder"
+
+```
+
+```{r Groteweerschijnvlinder, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   filter(doy < 200) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+```{r Groteweerschijnvlindergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+### Heivlinder
+
+```{r}
+soort <- "Heivlinder"
+
+```
+
+```{r Heivlinder, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+```{r Heivlindergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+### Klaverblauwtje
+
+```{r}
+soort <- "Klaverblauwtje"
+
+```
+
+```{r Klaverblauwtje, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ 
+```
+
+
+```{r Klaverblauwtjegemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+### Kommavlinder
+
+```{r}
+soort <- "Kommavlinder"
+
+```
+
+```{r Kommavlinder, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+ 
+```
+
+
+```{r Kommavlindergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+
+### Oranje zandoogje
+
+```{r}
+soort <- "Oranje zandoogje"
+
+```
+
+```{r Oranjezandoogje, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+  q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+```
+
+
+```{r Oranjezandoogjegemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+
+
+### Veldparelmoervlinder
+
+```{r}
+soort <- "Veldparelmoervlinder"
+
+```
+
+```{r Veldparelmoervlinder, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort <- aantallen_bezoek_totaal %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort$aantal) * 1.2
+
+ p <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+  q <- aantallen_soort %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q #ggplotly(q)
+```
+
+
+```{r Veldparelmoervlindergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_nl, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
