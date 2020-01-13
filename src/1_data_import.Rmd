@@ -3,7 +3,7 @@
 # Data
 
 ```{r}
-versie <- "versie2020-01-06"
+versie <- "versie2020-01-10"
 ```
 
 We maken gebruik van een export uit de meetnetten-databank met ingevoerde gegevens t.e.m. `r versie`.
@@ -42,13 +42,14 @@ aantallen <- aantallen %>%
   select(soortgroep, meetnet, protocol, locatie, jaar, datum, doy, everything())
 
 werkpakketten <- werkpakketten %>%
-  mutate(wp_start = as.Date(wp_start, format = "%Y-%m-%d"),
-         wp_end = as.Date(wp_end,  format = "%Y-%m-%d"),
+  mutate(wp_start = as.Date(start_wp, format = "%Y-%m-%d"),
+         wp_end = as.Date(einde_wp,  format = "%Y-%m-%d"),
          doy_min = as.numeric(format(wp_start, "%j")),
          doy_max = as.numeric(format(wp_end, "%j")),
-         doy_mid = doy_min + round((doy_max - doy_min)/2, 0))
-
-
+         doy_mid = doy_min + round((doy_max - doy_min)/2, 0),
+         jaar= as.numeric((format(wp_start, "%Y")))) %>%
+  filter(jaar == 2019)
+  
 tellers_orig <- read.csv2(paste("../data/", versie, "/tellers.csv", sep = ""), stringsAsFactors = FALSE)
 
 tellers <- tellers_orig %>%
