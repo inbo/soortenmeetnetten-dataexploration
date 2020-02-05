@@ -1,0 +1,156 @@
+# Planning 2020
+
+## Kamsalamander
+
+```{r}
+steekproefkader_kamsalamander <- st_read("../../data/steekproefkader", "Kamsalamander_steekproefkader_WGS84_versie2019-03-07")
+
+steekproefkader_details <- steekproefkader_kamsalamander %>%
+  st_drop_geometry() %>%
+  select(naam = Naam, gebied = GebiedCode, stratum = Stratum, steekproef = Steekproef, vlg_geb = Vlg_geb, vlg_punt = Vlg_punt, nStkpr_geb) %>%
+  mutate(naam = str_to_lower(naam)) %>%
+  group_by(gebied) %>%
+  mutate(gebied_in_steekproef = sum(steekproef) > 0) %>%
+  ungroup() %>%
+  mutate(naam = ifelse(naam == "de brand - poel n31" & steekproef == 0, "de brand - poel n31bis", naam),
+         naam = ifelse(naam == "antitankgracht haacht - poel 16c" & steekproef == 0, "antitankgracht haacht - poel 16cbis", naam))
+  
+
+steekproef_kamsalamander <- steekproefkader_kamsalamander %>%
+  filter(Steekproef >= 1)
+```
+
+
+```{r}
+
+locaties_kamsalamander <- locaties %>%
+  filter(meetnet == "Kamsalamander") %>%
+  filter(is_active) %>%
+  select(meetnet, locatie, is_sample) %>%
+  st_drop_geometry()
+
+# jaren <- data.frame(meetnet = "Kamsalamander",
+#                     jaar = c(2017, 2018, 2019))
+
+protocollen <- data.frame(meetnet = "Kamsalamander",
+                    protocol = c("Amfibieën - Fuiken",
+                                 "Amfibieën - Larven en metamorfen"))
+
+overzicht_meetcyclus <- locaties_kamsalamander %>%
+  # left_join(jaren, by = "meetnet") %>%
+  left_join(protocollen, by = "meetnet")
+
+```
+
+
+```{r}
+
+evaluatie_kamsalamander <-  evaluatie_locaties %>%
+  filter(is_active == 1) %>%
+  filter(meetnet == "Kamsalamander") %>%
+  group_by(meetnet, protocol, is_sample, locatie) %>%
+  summarise(voldoende_data_cyclus= sum(voldoende_data) > 0,
+            voldoende_geteld_cyclus = sum(voldoende_geteld) > 0 ) %>%
+  ungroup()
+
+overzicht_uitvoer <- overzicht_meetcyclus %>%
+  left_join(evaluatie_kamsalamander, by = c("meetnet","locatie", "protocol", "is_sample")) %>%
+  mutate(voldoende_data_cyclus = ifelse(is.na(voldoende_data_cyclus), 0, voldoende_data_cyclus),
+         voldoende_geteld_cyclus = ifelse(is.na(voldoende_geteld_cyclus), 0, voldoende_geteld_cyclus)
+         ) %>%
+  arrange(desc(is_sample), locatie, protocol) 
+  
+overzicht_uitvoer_wide <- overzicht_uitvoer %>%
+  select(-voldoende_geteld_cyclus) %>%
+  mutate(protocol = ifelse(protocol == "Amfibieën - Fuiken", "fuiken",
+                           ifelse(protocol == "Amfibieën - Larven en metamorfen", "larventelling", NA))) %>%
+  spread(key = "protocol", value = "voldoende_data_cyclus") %>%
+  filter(!(is_sample == 0 & fuiken == 0 & larventelling == 0)) %>%
+  arrange(is_sample, locatie) 
+
+overzicht_uitvoer_wide2 <- overzicht_uitvoer %>%
+  select(-voldoende_data_cyclus) %>%
+  mutate(protocol = ifelse(protocol == "Amfibieën - Fuiken", "fuiken_vg",
+                           ifelse(protocol == "Amfibieën - Larven en metamorfen", "larventelling_vg", NA))) %>%
+  spread(key = "protocol", value = "voldoende_geteld_cyclus") %>%
+  filter(!(is_sample == 0 & fuiken_vg == 0 & larventelling_vg == 0)) %>%
+  arrange(is_sample, locatie) %>%
+  select(-fuiken_vg)
+
+overzicht_uitvoer_wide3 <- overzicht_uitvoer_wide %>%
+  left_join(overzicht_uitvoer_wide2, by = c("is_sample","meetnet", "locatie")) %>%
+  mutate(larventelling_gvm = ifelse(larventelling == 0 & larventelling_vg == 1, 1, 0)) %>%
+  select(-larventelling_vg)
+  
+```
+
+
+```{r}
+check_extra <- overzicht_uitvoer_wide3 %>%
+  mutate(locatie = str_replace(locatie, "poel", "Poel"),
+         temp = str_detect(locatie, "Poel"),
+         temp2 = str_sub(locatie, -1, -1) %in% as.character(c(0:50)),
+         naam = ifelse(temp, locatie, 
+                       ifelse(temp2, str_c(str_sub(locatie, 1, -2), "- Poel ", str_sub(locatie, -1, -1)),
+                              str_c(locatie, " - Poel 1"))),
+         naam = str_to_lower(naam),
+         afgewerkt = (fuiken == 1) & (larventelling == 1)) %>%
+  select(-temp, -temp2) %>%
+  left_join(steekproefkader_details, by = "naam") %>%
+  filter(!is.na(gebied)) %>%
+  group_by(gebied) %>%
+  mutate(n_geteld_gebied_sample = sum(afgewerkt & (is_sample == 1)),
+         n_geteld_gebied_extra = sum(afgewerkt & (is_sample == 0))) %>%
+  ungroup() %>%
+  mutate(n_tekort_gebied =nStkpr_geb * gebied_in_steekproef - n_geteld_gebied_sample) %>%
+  filter(gebied_in_steekproef == 1) %>%
+  mutate(extra_locatie_pot = afgewerkt & (is_sample == 0) & (n_tekort_gebied > 0))
+    
+    
+vervangpunten <- check_extra %>%
+  filter(extra_locatie_pot) %>%
+  group_by(gebied) %>%
+  mutate(volgorde_vervanging = rank(vlg_punt)) %>%
+  ungroup() %>%
+  mutate(vervangpunt = volgorde_vervanging <= n_tekort_gebied) %>%
+  filter(vervangpunt)
+
+te_vervangen_binnen_gebied <- check_extra %>%
+  filter(gebied %in% vervangpunten$gebied) %>%
+  filter(is_sample == 1) %>%
+  filter(!afgewerkt) %>%
+  group_by(gebied) %>%
+  mutate(volgorde_vervanging = rank(desc(vlg_punt))) %>%
+  ungroup()
+
+te_vervangen_gebied_klein <- check_extra %>%
+  filter(is_sample == 1) %>%
+  filter(!afgewerkt) %>%
+  filter(stratum == "Klein") %>%
+  arrange(desc(vlg_geb), desc(vlg_punt))
+
+```
+
+
+```{r}
+to_do <- overzicht_uitvoer_wide3 %>%
+  filter(is_sample == 1) %>%
+  filter(fuiken == 0 | larventelling == 0) %>%
+  filter(!locatie %in% c("Antitankgracht Haacht - Poel 16",
+                      "De Brand - Poel n31",
+                      "Kleine Struisbeekvallei - Poel 1",
+                      "Lo-Relinge - Poel 3")) %>%
+  mutate(todo = ifelse(fuiken == 0 & larventelling == 0, "fuiken + larventelling",
+                       ifelse(fuiken == 0, "enkel fuiken",
+                              "enkel larventelling"))) 
+
+sum(to_do$fuiken == 0)
+sum(to_do$larventelling == 0)
+sum(to_do$larventelling_gvm == 1)
+
+write.csv2(to_do, "../../output/todo_kamsalamander.csv")
+
+```
+
+
+

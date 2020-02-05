@@ -1,0 +1,539 @@
+# Vaatplanten
+
+```{r}
+sg <- "planten"
+
+planten_protocol <- taken %>%
+  filter(jaar == 2019) %>%
+  filter(soortgroep == "planten") %>%
+  distinct(meetnet, protocol)
+
+```
+
+
+```{r}
+
+locaties_planten_sf <- locaties %>%
+  filter(soortgroep == "planten") %>%
+  filter(is_active) %>%
+  mutate(locatie = as.character(locatie),
+         meetnet = as.character(meetnet)) %>%
+  select(meetnet, locatie)
+
+locaties_planten <- locaties_planten_sf %>%
+  st_drop_geometry() %>%
+  mutate(locatie_mn = 1)
+
+locaties_planten_sf <- locaties_planten_sf %>%
+  st_transform(crs = 31370) 
+  
+data_wnm_2019_orig <- read.csv2("../../data/planten/Export_opleverenplantenwaarnemingen2019finaal.csv", stringsAsFactors  = FALSE)
+
+data_wnm_2019_sf <- data_wnm_2019_orig %>%
+  mutate(datum = as.Date(datum, format = "%d/%m/%Y"),
+         jaar = as.numeric(format(datum, "%Y")),
+         id = as.character(id),
+         naam_nl = ifelse(naam_lat == "Gentianella amarella subsp. uliginosa", "Duingentiaan", naam_nl)) %>% 
+  st_as_sf(coords = c("x", "y"), crs = 31370) %>%
+  st_join(locaties_planten_sf) %>%
+  group_by(id) %>%
+  mutate(n = n()) %>%
+  ungroup() %>%
+  filter(! ((n > 1) &  (naam_nl != meetnet))) %>%
+  select(id, naam_nl, meetnet, locatie_np = "Locatie.Meetnetten.be", locatie, gebied, jaar, datum, aantal, code = Floroncode, typewaarneming) %>%
+  mutate(locatie = ifelse(naam_nl != meetnet, NA, locatie), #soms overlap met meetnetlocatie van ander meetnet --> verwijderen
+         meetnet =  ifelse(naam_nl != meetnet, NA, meetnet))
+
+check_locatienaam <- data_wnm_2019_sf %>%
+  st_drop_geometry() %>%
+  filter(!is.na(meetnet) & (locatie_np != locatie) & (locatie_np != "")) %>%
+  filter(locatie_np != "Goorke – Rode Del (b6-43-31)") %>%
+  select(id, meetnet, locatie_np, locatie)
+
+write.csv2(check_locatienaam, "../../output/planten_check_namen.csv")
+
+data_wnm_2019 <- data_wnm_2019_sf %>% 
+  mutate(locatie = ifelse(locatie_np == "Goorke – Rode Del (b6-43-31)", "Goorke – Rode Del (b6-43-31)", locatie),
+         locatie_planten = ifelse(is.na(locatie), locatie_np, locatie),
+         meetnet = ifelse(is.na(meetnet), naam_nl, meetnet),
+         locatie_planten = ifelse(is.na(locatie) & locatie_np ==  "", gebied, locatie_planten),
+         type_locatie = ifelse(is.na(locatie) & locatie_np ==  "", "Extra locatie", "Meetnetlocatie")) %>%
+  st_drop_geometry()
+         
+check <-  data_wnm_2019 %>%
+  select(id, meetnet, locatie = locatie_planten, type_locatie) %>%
+  filter(type_locatie == "Meetnetlocatie") %>%
+  left_join(locaties_planten, by = c("meetnet", "locatie"))
+
+data_wnm_2019 <- data_wnm_2019 %>%
+  mutate(locatie_planten = ifelse(locatie_planten == "Ter Yde3 (c0-48-42)", "Ter Yde/Karthuizerduinen1a  (c0-48-24)", locatie_planten),
+         locatie_planten = ifelse(locatie_planten == "Tielenkamp 2b (c5-17-21)", "Tielenkamp2b (c5-17-21)", locatie_planten)
+         )
+
+aantallen_planten_wnm <- data_wnm_2019 %>%
+  left_join(planten_protocol, by = "meetnet") %>%
+  mutate(invoer_type = ifelse(typewaarneming %in% c("iObs", "ObsMapp"), "mobiel", "website"),
+         protocol = ifelse(meetnet == "Stekende bies", "Vaatplanten - Oppervlakte", protocol),
+         databank = "waarnemingen.be") %>%
+  select(type_locatie, meetnet, protocol, locatie = locatie_planten, datum, floroncode = code, aantal, invoer_type, databank) 
+
+```
+
+
+
+```{r data mn}
+
+aantallen_planten_mn <- read.csv2(paste("../../data/", versie, "/aantallen_planten.csv", sep = ""), stringsAsFactors = FALSE)
+
+aantallen_planten_track <- st_read(paste("../../data/", versie, "/planten_tracks.gpkg", sep = ""),
+                    str_c("planten_tracks_", versie), quiet = TRUE)
+
+aantallen_planten_mn <- aantallen_planten_mn %>%
+  mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
+         type_locatie = "Meetnetlocatie",
+         invoer_type = ifelse(track == 1, "mobiel", "website"),
+         databank = "meetnetten.be") %>%
+  select(type_locatie, meetnet, protocol, locatie, datum, visit_id, floroncode = flororcode, track, invoer_type, databank)
+    
+```
+
+```{r planten combined}
+
+aantallen_planten_tot <- aantallen_planten_mn %>%
+  bind_rows(aantallen_planten_wnm) 
+
+# bezoeken_planten <- bezoeken %>%
+#   filter(soortgroep == "planten") %>%
+#   filter(jaar == 2019)
+
+bezoeken_planten <- aantallen_planten_tot %>%
+  group_by(type_locatie, meetnet, protocol, locatie, datum, track, invoer_type, databank) %>%
+  summarise(aantal_telpunten_cp = sum(floroncode != "" | (protocol == "Vaatplanten - Aantal individuen" & !is.na(aantal))),
+            aantal_telpunten_nvcp = sum(floroncode == "" & (protocol == "Vaatplanten - Oppervlakte"))) %>%
+  ungroup()
+   
+locaties_planten_exp <-  bezoeken_planten %>%
+  filter(aantal_telpunten_cp > 0) %>%
+  arrange(type_locatie, meetnet, protocol, locatie, databank, invoer_type) %>%
+  group_by(type_locatie, meetnet, protocol, locatie, databank) %>%
+  summarise(invoer_type = str_c(unique(invoer_type), collapse = " + "),
+            aantal_bezoeken_cp = sum(aantal_telpunten_cp > 0),
+            som_telpunten_cp = sum(aantal_telpunten_cp)) %>%
+  ungroup() %>%
+  arrange(desc(type_locatie))
+
+locaties_planten <-  bezoeken_planten %>%
+  filter(aantal_telpunten_cp > 0) %>%
+  arrange(type_locatie, meetnet, protocol, locatie, databank, invoer_type) %>%
+  group_by(type_locatie, meetnet, protocol, locatie, databank, invoer_type) %>%
+  summarise(aantal_bezoeken_cp = sum(aantal_telpunten_cp > 0),
+            som_telpunten_cp = sum(aantal_telpunten_cp)) %>%
+  ungroup() %>%
+  arrange(desc(type_locatie))
+
+meetnetten_planten <- locaties_planten %>%
+  left_join(meetnetten_n_locaties, by = "meetnet") %>%
+  rename(aantal_meetnetlocaties = meetnetlocaties) %>%
+  mutate(aantal_meetnetlocaties = ifelse(type_locatie == "Extra locatie", NA, aantal_meetnetlocaties)) %>%
+  group_by(type_locatie, meetnet, protocol) %>%
+  mutate(aantal_getelde_locaties =  n_distinct(locatie),
+         aantal_telpunten_cp = sum(som_telpunten_cp)) %>%
+  ungroup() %>%
+  arrange(type_locatie, meetnet, protocol, locatie, databank) %>%
+  group_by(type_locatie, meetnet, protocol, aantal_meetnetlocaties, databank, aantal_getelde_locaties, aantal_telpunten_cp) %>%
+  summarise(aantal_getelde_locaties_db = n_distinct(locatie),
+            aantal_telpunten_cp_db = sum(som_telpunten_cp)) %>%
+  ungroup()  %>% 
+#   spread(key = "databank", value = "aantal_getelde_locaties_db", fill = 0) %>%
+ arrange(desc(type_locatie))
+
+meetnetten_planten_telpunten_wide <- meetnetten_planten %>%
+  select(-aantal_getelde_locaties_db) %>%
+  spread(key = "databank", value = "aantal_telpunten_cp_db", fill = 0) %>%
+  rename(aantal_telpunten_mn = meetnetten.be, aantal_telpunten_wnm = waarnemingen.be) %>%
+  select(type_locatie, meetnet, protocol, aantal_telpunten_mn, aantal_telpunten_wnm)
+
+meetnetten_planten_locaties_wide <- meetnetten_planten %>%
+  select(-aantal_telpunten_cp_db) %>%
+  spread(key = "databank", value = "aantal_getelde_locaties_db", fill = 0) %>%
+  rename(aantal_getelde_locaties_mn = meetnetten.be, aantal_getelde_locaties_wnm = waarnemingen.be)
+
+meetnetten_planten_wide <- meetnetten_planten_locaties_wide %>%
+  left_join(meetnetten_planten_telpunten_wide, by = c("type_locatie", "meetnet", "protocol"))
+
+
+totaal_locties_planten <- sum(
+  (meetnetKarakt  %>%
+  filter(soortengroep == "Vaatplanten"))$meetnetlocaties, 
+  na.rm = TRUE)
+
+totaal_planten <- meetnetten_planten_wide %>%
+  group_by(type_locatie) %>%
+  summarise(aantal_meetnetlocaties = sum(aantal_meetnetlocaties),
+            aantal_getelde_locaties_tot = sum(aantal_getelde_locaties),
+            aantal_getelde_locaties_mn = sum(aantal_getelde_locaties_mn),
+            aantal_getelde_locaties_wnm = sum(aantal_getelde_locaties_wnm)) %>%
+  ungroup() %>%
+  mutate(aantal_meetnetlocaties = ifelse(type_locatie == "Meetnetlocatie", totaal_locties_planten, aantal_meetnetlocaties),
+         jaardoel = ceiling(aantal_meetnetlocaties/3))
+  
+#mobiel
+
+meetnetten_planten_mobiel <- locaties_planten %>%
+  filter(invoer_type == "mobiel") %>%
+  left_join(meetnetten_n_locaties, by = "meetnet") %>%
+  rename(aantal_meetnetlocaties = meetnetlocaties) %>%
+  mutate(aantal_meetnetlocaties = ifelse(type_locatie == "Extra locatie", NA, aantal_meetnetlocaties)) %>%
+  group_by(type_locatie, meetnet, protocol) %>%
+  mutate(aantal_getelde_locaties =  n_distinct(locatie),
+         aantal_telpunten_cp = sum(som_telpunten_cp)) %>%
+  ungroup() %>%
+  arrange(type_locatie, meetnet, protocol, locatie, databank) %>%
+  group_by(type_locatie, meetnet, protocol, aantal_meetnetlocaties, databank, aantal_getelde_locaties, aantal_telpunten_cp) %>%
+  summarise(aantal_getelde_locaties_db = n_distinct(locatie),
+            aantal_telpunten_cp_db = sum(som_telpunten_cp)) %>%
+  ungroup()  %>% 
+#   spread(key = "databank", value = "aantal_getelde_locaties_db", fill = 0) %>%
+ arrange(desc(type_locatie))
+
+meetnetten_planten_telpunten_wide <- meetnetten_planten_mobiel %>%
+  select(-aantal_getelde_locaties_db) %>%
+  spread(key = "databank", value = "aantal_telpunten_cp_db", fill = 0) %>%
+  rename(aantal_telpunten_mn = meetnetten.be, aantal_telpunten_wnm = waarnemingen.be) %>%
+  select(type_locatie, meetnet, protocol, aantal_telpunten_mn, aantal_telpunten_wnm)
+
+meetnetten_planten_locaties_wide <- meetnetten_planten_mobiel %>%
+  select(-aantal_telpunten_cp_db) %>%
+  spread(key = "databank", value = "aantal_getelde_locaties_db", fill = 0) %>%
+  rename(aantal_getelde_locaties_mn = meetnetten.be, aantal_getelde_locaties_wnm = waarnemingen.be)
+
+meetnetten_planten_mobiel_wide <- meetnetten_planten_locaties_wide %>%
+  left_join(meetnetten_planten_telpunten_wide, by = c("type_locatie", "meetnet", "protocol"))
+
+totaal_planten_mobiel <- meetnetten_planten_mobiel_wide %>%
+  group_by(type_locatie) %>%
+  summarise(aantal_meetnetlocaties = sum(aantal_meetnetlocaties),
+            aantal_getelde_locaties_tot = sum(aantal_getelde_locaties),
+            aantal_getelde_locaties_mn = sum(aantal_getelde_locaties_mn),
+            aantal_getelde_locaties_wnm = sum(aantal_getelde_locaties_wnm)) %>%
+  ungroup() 
+
+
+write.csv2(locaties_planten_exp, str_c("../../Output/overzicht_locaties_planten", versie), row.names = FALSE)
+  
+```
+
+
+
+
+
+
+
+## Meetnetkarakteristieken
+
+Tabel \@ref(tab:MeetnKaraktvaatplanten1) en Tabel \@ref(tab:MeetnKaraktvaatplanten2) geven een overzicht van de karakteristieken van de vaatplantenmeetnetten.
+
+```{r MeetnKaraktvaatplanten1, message= FALSE, warning= FALSE, results= 'asis'}
+
+meetnetKarakt %>%
+  filter(soortengroep == "Vaatplanten") %>%
+  filter(!is.na(meetnetlocaties)) %>%
+  select(meetnet, protocol, meetnetlocaties, type, 'duur meetcyclus'= duur_meetcyclus, start = opstartjaar) %>%
+  unique() %>%
+  arrange(meetnet) %>%
+  kable(caption = "Overzicht van de karakteristieken van de vaatplantenmeetnetten: veldprotocol, type meetnet (integraal of steekproef), aantal meetnetlocaties en de meetcyclus in jaren", 
+        row.names = FALSE, 
+        booktabs = TRUE,
+        format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  column_spec(5, width = "2cm")
+  
+```
+
+
+```{r MeetnKaraktvaatplanten2, message= FALSE, warning= FALSE, results= 'asis'}
+
+meetnetKarakt %>%
+  filter(soortengroep == "Vaatplanten") %>%
+  filter(!is.na(meetnetlocaties)) %>%
+  arrange(meetnet) %>%
+  select(meetnet,  'Bezoeken (/jaar)' = bezoeken, 'Begin telperiode' = begin_telperiode, 'Einde telperiode' = einde_telperiode) %>%
+  unique() %>%
+  kable(caption = "Overzicht van de karakteristieken van de vaatplantenmeetnetten: aantal bezoeken per jaar, begin en einde van de telperiode", row.names = FALSE, booktabs = TRUE, align = c("l", "c", "c", "c")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+  # column_spec(1, width = "2cm") %>%
+  # column_spec(4, width = "2cm") %>%
+  # column_spec(5, width = "2cm") %>%
+ # column_spec(6, width = "2cm")%>%
+  collapse_rows(columns = 1)
+
+```
+
+## Overzicht van de uitgevoerde tellingen
+
+### Evaluatie tellingen per meetnet
+
+In Tabel \@ref(tab:overzichtTellingenvaatplanten1) geven we een overzicht van de tellingen van 2019 per meetnet.
+
+```{r overzichtTellingenvaatplanten1, message= FALSE, warning= FALSE, results= 'asis'}
+
+nrow_mn <- sum(meetnetten_planten_wide$type_locatie == "Meetnetlocatie")
+nrow_extra <- sum(meetnetten_planten_wide$type_locatie == "Extra locatie")
+
+meetnetten_planten_wide %>%
+  arrange(desc(type_locatie)) %>%
+  select(meetnet, protocol,
+    "meetnetlocaties" = aantal_meetnetlocaties,
+    "getelde locaties" = aantal_getelde_locaties,
+    "telpunten" = aantal_telpunten_cp,
+    "getelde locaties" = aantal_getelde_locaties_mn,
+    "telpunten" = aantal_telpunten_mn,
+    "getelde locaties" = aantal_getelde_locaties_wnm,
+    "telpunten" = aantal_telpunten_wnm
+  ) %>%
+  kable(caption = "Overzicht tellingen 2019", 
+        align = c("l", "l", "c", "c", "c", "c", "c", "c", "c")) %>%
+  kable_styling("striped", font_size = 9) %>%
+  add_header_above(c(" " = 3, "Totaal" = 2, "Meetnetten.be" = 2, "Waarnemingen.be" = 2)) %>%
+  pack_rows("Meetnetlocatie", 1, nrow_mn) %>%
+  pack_rows("Extra locatie", nrow_mn + 1 , nrow_mn + nrow_extra)
+  
+```
+
+
+### Evaluatie totaal aantal tellingen
+
+In Tabel \@ref(tab:overzichtTellingenvaatplanten2) geven we een overzicht van het totaal aantal tellingen in 2019.
+
+```{r overzichtTellingenvaatplanten2}
+
+totaal_planten %>%
+  arrange(desc(type_locatie)) %>%
+  select(type_locatie,
+    "meetnetlocaties" = aantal_meetnetlocaties,
+    jaardoel,
+    "getelde locaties" = aantal_getelde_locaties_tot,
+    "getelde locaties" = aantal_getelde_locaties_mn,
+    "getelde locaties" = aantal_getelde_locaties_wnm,
+  ) %>%
+  kable(caption = "Overzicht tellingen 2019", 
+        align = c("l", "l", "c", "c", "c", "c", "c", "c", "c")) %>%
+  kable_styling("striped", font_size = 9) %>%
+  add_header_above(c(" " = 3, "Totaal" = 1, "Meetnetten.be" = 1, "Waarnemingen.be" = 1))
+
+```
+
+
+### Overzicht mobiel ingevoerde tellingen per meetnet
+
+In Tabel \@ref(tab:overzichtTellingenvaatplanten3) geven we een overzicht van de mobiel ingevoerde tellingen van 2019 per meetnet.
+
+```{r overzichtTellingenvaatplanten3, message= FALSE, warning= FALSE, results= 'asis'}
+
+nrow_mn <- sum(meetnetten_planten_mobiel_wide$type_locatie == "Meetnetlocatie")
+nrow_extra <- sum(meetnetten_planten_mobiel_wide$type_locatie == "Extra locatie")
+
+meetnetten_planten_mobiel_wide %>%
+  arrange(desc(type_locatie)) %>%
+  select(meetnet, protocol,
+    "meetnetlocaties" = aantal_meetnetlocaties,
+    "getelde locaties" = aantal_getelde_locaties,
+    "telpunten" = aantal_telpunten_cp,
+    "getelde locaties" = aantal_getelde_locaties_mn,
+    "telpunten" = aantal_telpunten_mn,
+    "getelde locaties" = aantal_getelde_locaties_wnm,
+    "telpunten" = aantal_telpunten_wnm
+  ) %>%
+  kable(caption = "Overzicht tellingen 2019", 
+        align = c("l", "l", "c", "c", "c", "c", "c", "c", "c")) %>%
+  kable_styling("striped", font_size = 9) %>%
+  add_header_above(c(" " = 3, "Totaal" = 2, "Meetnetten.be" = 2, "Waarnemingen.be" = 2)) %>%
+  pack_rows("Meetnetlocatie", 1, nrow_mn) %>%
+  pack_rows("Extra locatie", nrow_mn + 1 , nrow_mn + nrow_extra)
+  
+```
+
+
+### Overzicht totaal mobiel ingevoerde tellingen
+
+In Tabel \@ref(tab:overzichtTellingenvaatplanten4) geven we een overzicht van het totaal aantal mobiel ingevoerde tellingen in 2019.
+
+```{r overzichtTellingenvaatplanten4}
+
+totaal_planten_mobiel %>%
+  arrange(desc(type_locatie)) %>%
+  select(type_locatie,
+    "getelde locaties" = aantal_getelde_locaties_tot,
+    "getelde locaties" = aantal_getelde_locaties_mn,
+    "getelde locaties" = aantal_getelde_locaties_wnm,
+  ) %>%
+  kable(caption = "Overzicht mobiel ingevoerde tellingen 2019", 
+        align = c("l",  "c", "c", "c", "c", "c", "c", "c")) %>%
+  kable_styling("striped", font_size = 9) %>%
+  add_header_above(c(" " = 1, "Totaal" = 1, "Meetnetten.be" = 1, "Waarnemingen.be" = 1))
+
+```
+
+
+
+
+### Tijdstippen van de tellingen
+
+In Figuur \@ref(fig:figuurBezoekenvaatplanten) vergelijken we de tijdstippen van de bezoeken met de telperiodes (weergegeven via verticale stippellijnen).  
+
+```{r figuurBezoekenvaatplanten, message= FALSE, warning= FALSE, fig.height= 9, fig.width= 7,  fig.cap = "Overzicht tijdstippen waarop tellingen werden uitgevoerd in 2019" }
+
+bezoeken_figuur <- bezoeken_planten %>% 
+  left_join(telperiodes_2019, by = c("meetnet")) %>%
+  select(type_locatie, databank, meetnet,locatie, datum, start_telperiode, einde_telperiode) %>%
+  unique()
+
+ggplot(data = bezoeken_figuur, aes(x = datum, fill = databank)) + 
+  geom_histogram(binwidth = 7, colour = "white") +
+  geom_vline(aes(xintercept = start_telperiode), data = bezoeken_figuur, linetype = 2) +
+  geom_vline(aes(xintercept = einde_telperiode), data = bezoeken_figuur, linetype = 2) +
+  facet_wrap( ~ meetnet, ncol = 3) + 
+  labs(x = "Datum bezoek", y = "Aantal bezoeken")  + 
+  theme( axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+Onderstaande tabel geeft een overzicht van de tellingen die minsten 10 dagen buiten de telperiode werden uitgevoerd. De kolom 'verschil_dagen' geeft het verschil in dagen t.o.v. de telperiode volgens het veldprotocol.
+
+```{r}
+
+bezoeken_buiten_telperiode_planten <- bezoeken_figuur %>%
+  mutate(verschil_dagen = ifelse(datum < start_telperiode, 
+                                datum - start_telperiode,
+                                ifelse(datum > einde_telperiode, datum - einde_telperiode, 0)))
+
+
+bezoeken_buiten_telperiode_planten %>%
+  filter(!is.na(verschil_dagen)) %>%
+  filter(abs(verschil_dagen) >=10) %>%
+  arrange(desc(abs(verschil_dagen))) %>%
+  select(meetnet, databank, type_locatie, everything()) %>%
+  kable(booktabs = TRUE,
+        caption = "Bezoeken buiten telperiode",
+        align = c("l", "l", "c","c","c", "c", "c", "c", "c", "c", "c")) %>%
+ kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+               font_size = 11) %>%
+  collapse_rows(columns = 1 )
+  # datatable(rownames = FALSE,
+  #           filter = 'top',
+  #           extensions = c('Buttons', 'Scroller'),
+  #           options = list(
+  #             dom = 'Bfrtip',
+  #             buttons = c('copy', 'pdf', 'csv', 'excel'),
+  #             language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Dutch.json'),
+  #             deferRender = TRUE,
+  #              scrollY = 400,
+  #              scroller = TRUE,
+  #              scrollX = TRUE
+  #             )
+  #           )
+
+
+```
+
+
+
+### Afwijkingen van het protocol
+
+De volgende tabel geeft een overzicht van de afwijkingen van het protocol van de tellingen ingevoerd in meetnetten.be.
+
+```{r afwijkingenProtocolVaatplanten, message= FALSE, warning= FALSE}
+
+bezoeken %>% 
+  filter(soortgroep == sg) %>% 
+  filter(jaar == 2019) %>% 
+  filter(bezoek_status_detail != "Conform protocol") %>% 
+  select(meetnet, datum, locatie, "bezoek status" = bezoek_status_detail, opmerkingen = notes) %>%
+  mutate(opmerkingen = gsub("\n", ". ", opmerkingen)) %>%
+  kable(booktabs = TRUE, escape = TRUE) %>%
+  kable_styling(latex_options =  c( "hold_position"),
+                bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>%
+    column_spec(5, width = "6cm") %>%
+   column_spec(2, width = "3cm")
+    # datatable(rownames = FALSE,
+    #         filter = 'top',
+    #         extensions = c('Buttons', 'Scroller'),
+    #         options = list(
+    #           dom = 'Bfrtip',
+    #           buttons = c('copy', 'pdf', 'csv', 'excel'),
+    #           language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Dutch.json'),
+    #           deferRender = TRUE,
+    #            scrollY = 400,
+    #            scroller = TRUE,
+    #            scrollX = TRUE
+    #           )
+    #         )
+  
+```
+
+
+
+## Opmerkingen bij meetnetlocaties
+
+```{r}
+
+locaties_opm %>%
+  filter(soortgroep == sg) %>%
+  filter(is_active) %>%
+  arrange(meetnet) %>%
+  select(-soortgroep) %>%
+  kable(booktabs = TRUE, 
+        caption = "Opmerkingen locaties") %>%
+ kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+               font_size = 11) %>%
+  collapse_rows(columns = 1 )
+```
+
+## Visualisatie tellingen
+
+```{r}
+
+aantallen_planten_tot_sf <- rbind(
+  
+  data_wnm_2019_sf %>%
+  select(id) %>% 
+  left_join(data_wnm_2019, by = "id") %>%
+  st_transform(crs = 4326) %>%
+    rename(geom = geometry) %>%
+  select(meetnet, type_locatie, locatie = locatie_planten, datum, code) %>%
+  mutate(databank = "waarnemingen.be"),
+  
+  aantallen_planten_track %>%
+    select(meetnet, locatie, datum, code) %>%
+    mutate(databank = "meetnetten.be",
+           type_locatie = "Meetnetlocatie")
+  
+) %>%
+  mutate(databank = factor(databank),
+         label = str_c(meetnet, code, sep = " "))
+
+
+locaties_shared <- SharedData$new(aantallen_planten_tot_sf)
+
+factpal <- colorFactor(c(inbo.steun.donkerroos, inbo.groen), aantallen_planten_tot_sf$databank)
+
+bscols(
+  list(
+    bscols(widths = c(3, 4, 5),
+           filter_checkbox("type_locatie", "Selecteer locatie", locaties_shared, ~type_locatie),
+           filter_checkbox("databank", "Selecteer databank", locaties_shared, ~databank),
+           filter_select("meetnet", "Selecteer meetnet", locaties_shared, ~meetnet, multiple = FALSE)),
+    leaflet(locaties_shared) %>%
+      addTiles() %>%
+      addCircleMarkers(radius = 1, color = ~factpal(databank), opacity = 0.6, fillOpacity = 0.6,  label = ~label) %>%
+      addLegend(pal = factpal, values = ~databank)
+    
+      )
+)
+
+
+
+
+```
+
+
+

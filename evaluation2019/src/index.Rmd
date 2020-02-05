@@ -1,0 +1,74 @@
+---
+title: "Meetnetevaluatie 2019"
+author: 
+  -
+    name: "Toon Westra"
+    email: "Toon.Westra@inbo.be"
+  -
+link-citations: TRUE
+site: bookdown::bookdown_site
+output:
+  bookdown::html_document2:
+    keep_md: TRUE
+    toc: TRUE
+    toc_float:
+      collapsed: FALSE
+      smooth_scroll: FALSE
+    number_sections: TRUE
+    split_by: "chapter+number"
+  bookdown::gitbook:
+    split_by: "chapter+number"
+    template: !expr INBOmd::inbo_rapport_css("html")
+  bookdown::pdf_book:
+    base_format: INBOmd::inbo_rapport
+
+---
+
+
+
+```{r setup, include = FALSE}
+library(knitr)
+options(knitr.kable.NA = '')
+opts_chunk$set(
+  echo = FALSE, 
+  eval = TRUE,
+  cache = FALSE,
+  warning = FALSE,
+  error = TRUE,
+  message = TRUE
+)
+library(tidyverse)
+library(INBOtheme)
+library(sf)
+library(kableExtra)
+library(DT)
+library(gridExtra)
+library(crosstalk)
+library(leaflet)
+
+# theme_set(
+#   theme_inbo(
+#     base_family = "Calibri", # "Flanders Art Sans",
+#     base_size = 12
+#   )
+# )
+# if (!interactive() && opts_knit$get("rmarkdown.pandoc.to") != "html") {
+#   opts_chunk$set(dev = "cairo_pdf")
+#   theme_set(
+#     theme_inbo(
+#       base_family = "Calibri", # "Flanders Art Sans",
+#       base_size = 8
+#     )
+#   )
+# }
+```
+
+
+# Inleiding
+
+In dit rapport geven we een overzicht van de uitgevoerde tellingen in kader van de soortenmeetnetten en maken we een verkenning van de ingevoerde aantallen.
+
+Het merendeel van de data komt uit de databank gekoppeld aan de meetnetten.be applicatie. We maken gebruik van een data-export die dateert van 8-01-2020. Voor een aantal meetnetten is het nog niet mogelijk om de data in te voeren via meetnetten.be. In deze gevallen wordt de data jaarlijks aangeleverd aan het INBO, meestal onder de vorm van een excel-bestand. 
+
+Voor elk meetnet worden jaardoelen gedefinieerd. Dit zijn afspraken over de te leveren inspanning uitgedrukt in aantal tellingen of het aantal locaties met een voldoende aantal tellingen (conform het protocol). Voor de evaluatie van de jaardoelen rekenen we de tellingen conform protocol en de tellingen waarvoor geen veldwerk mogelijk is mee. Voor de verkenning van de aantallen selecteren we enkel de tellingen conform protocol. 
+
