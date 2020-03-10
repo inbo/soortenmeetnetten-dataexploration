@@ -150,7 +150,116 @@ sum(to_do$larventelling_gvm == 1)
 
 write.csv2(to_do, "../../output/todo_kamsalamander.csv")
 
+
+to_do_corr <- to_do %>%
+  filter(!(fuiken == 1 & larventelling_gvm == 1))
 ```
 
+### Cyclus 2020-2024
 
+```{r}
 
+overzicht_cyclus1 <- evaluatie_locaties %>%
+  filter(meetnet == "Kamsalamander") %>%
+  filter(voldoende_data == 1 | (protocol == "Amfibieën - Larven en metamorfen" & voldoende_geteld == 1)) %>%
+  filter(is_sample == 1 | locatie %in% c("Antitankgracht Haacht - Poel 15", "De Brand - Poel 6", "Kleine Struisbeekvallei - poel 2", "Vallei van de Mark - Poel 1")) %>%
+  select(meetnet, protocol, locatie, jaar, voldoende_geteld, voldoende_data) %>%
+  group_by(locatie) %>%
+  mutate(afgewerkt = n_distinct(protocol) == 2) %>%
+  ungroup() %>%
+  filter(afgewerkt)
+
+overzicht_cyclus1_wide <- overzicht_cyclus1 %>%
+  select(meetnet, protocol, locatie, jaar, afgewerkt) %>%
+  group_by(meetnet, protocol, locatie, afgewerkt) %>%
+  summarise(jaar = str_c(jaar, collapse = " + ")) %>%
+  ungroup() %>%
+  spread(key = "protocol", value = "jaar") %>%
+  arrange(`Amfibieën - Fuiken`)
+
+write.csv2(overzicht_cyclus1_wide, "../../output/kamsalamander_2017_2019.csv", row.names = FALSE)
+
+```
+
+## Libellen
+
+```{r}
+overzicht_cyclus1_libellen <- evaluatie_locaties %>%
+  filter(protocol == "Libellen - Transecten") %>%
+  group_by(meetnet, is_sample, protocol, locatie) %>%
+  summarise(jaar = str_c(jaar, collapse = " + "),
+            voldoende_data = sum(voldoende_data) >= 1) %>%
+  ungroup() %>%
+  group_by(meetnet) %>%
+  mutate(n = n_distinct(locatie)) %>%
+  ungroup() %>%
+  arrange(meetnet, jaar, locatie)
+```
+
+### Te vervangen locaties
+
+#### Variabele waterjuffer
+
+In het meetnet Variabele waterjuffer moeten de locaties 'Oude Scheldearm Coupure' en 'Waterschei Stiemerbeekvallei' vervangen worden. Het leefgebied in de locatie 'Oude Scheldearm Coupure' is niet geschikt en wordt vervangen door 'Coupure Avelgem' (Z0004). Voor de vervanging van de andere locatie baseren we ons op GRTS-ranking. De eerstvolgende gebieden op basis van de ranking zijn deelgebiedjes van grotere gebieden die al in de steekproef zitten (Z0076, Z0083, Z0064) en selecteren we daarom niet. Het eerstvolgende gebied dat een afzonderlijke populatie bevat, is 'Oudbroekpolder' (Z0038).   
+
+```{r}
+
+steekproef_vw <- locaties %>%
+  filter(meetnet == "Variabele waterjuffer")
+
+steekproef_vw_orig <- read_sf("../../data/steekproefkader/variabele_selectie._dissolve.shp") %>%
+   st_drop_geometry()
+
+steekproefkader_vw_orig <- read_sf("../../data/steekproefkader/variabele_steekproefkader_dissolve.shp", crs = 31370) 
+  
+steekproefkader_vw <- steekproefkader_vw_orig %>%
+  st_transform(crs = 4326) %>%
+  left_join(steekproef_vw_orig, by =c("GRTS", "Zoekzone")) %>%
+  mutate(Steekproef = ifelse(is.na(Steekproef), 0, Steekproef),
+         toponiem = ifelse(is.na(toponiem), "", toponiem))
+
+steekproefkader_vw_update <- steekproefkader_vw %>%
+  mutate(Steekproef = ifelse(toponiem %in% c("Oude Scheldearm Coupure", "Waterschei Stiemerbeekvallei"), 0, Steekproef),
+         Steekproef = ifelse(Zoekzone %in% c("Z0004", "Z0038"), 1, Steekproef),
+         toponiem = ifelse(Zoekzone == "Z0004", "Coupure Avelgem", toponiem),
+         toponiem = ifelse(Zoekzone == "Z0038", "Oudbroekpolder", toponiem)) %>%
+  rename(deelgebied = Deelgebied, zoekzone = Zoekzone, grts_ranking = GRTS, naam = toponiem, steekproef = Steekproef)
+
+nieuwe_locaties <- steekproefkader_vw_update %>%
+  filter(naam %in% c("Coupure Avelgem", "Oudbroekpolder"))
+
+st_write(steekproefkader_vw, "../../data/steekproefkader", "variabele-waterjuffer_steekproefkader_versie2020-03-10", driver = "ESRI Shapefile", update = TRUE)
+
+st_write(nieuwe_locaties, "../../output/update_meetnetten", "wariabele-waterjuffer_addLocations_2020-03-10", driver = "ESRI Shapefile")
+```
+
+#### Vroege glazenmaker
+
+```{r}
+
+steekproef_vg_orig <- read_sf("../../data/steekproefkader/VroegeGlazenmaker_SteekproefGebieden.shp") %>%
+   st_drop_geometry() %>%
+  rename(GRTS = GRTS_gbd) %>%
+  mutate(Steekproef = 1)
+
+steekproefkader_vg_orig <- read_sf("../../data/steekproefkader/vroege_steekproefkader_dissolve.shp", crs = 31370) 
+  
+steekproefkader_vg <- steekproefkader_vg_orig %>%
+  st_transform(crs = 4326) %>%
+  left_join(steekproef_vg_orig, by =c("GRTS", "Zoekzone")) %>%
+  mutate(Steekproef = ifelse(is.na(Steekproef), 0, Steekproef),
+         toponiem = ifelse(is.na(Toponiem), "", Toponiem))
+
+steekproefkader_vg_update <- steekproefkader_vg %>%
+  mutate(Steekproef = ifelse(toponiem %in% c("Grootbroek"), 0, Steekproef),
+         Steekproef = ifelse(Zoekzone %in% c("Z0006"), 1, Steekproef),
+         toponiem = ifelse(Zoekzone == "Z0006", "Zoete waters", toponiem)) %>%
+  select(deelgebied = Deelgebied, zoekzone = Zoekzone, grts_ranking = GRTS, naam = toponiem, steekproef = Steekproef)
+
+nieuwe_locaties <- steekproefkader_vg_update %>%
+  filter(naam %in% c("Zoete waters"))
+
+st_write(steekproefkader_vw, "../../data/steekproefkader", "vroege-glazenmaker_steekproefkader_versie2020-03-10", driver = "ESRI Shapefile", update = TRUE)
+
+st_write(nieuwe_locaties, "../../output/update_meetnetten", "vroege-glazenmaker_addLocations_2020-03-10", driver = "ESRI Shapefile", update = TRUE)
+```
