@@ -207,10 +207,10 @@ In het meetnet Variabele waterjuffer moeten de locaties 'Oude Scheldearm Coupure
 steekproef_vw <- locaties %>%
   filter(meetnet == "Variabele waterjuffer")
 
-steekproef_vw_orig <- read_sf("../../data/steekproefkader/variabele_selectie._dissolve.shp") %>%
+steekproef_vw_orig <- read_sf("../../data/steekproefkader/steekproefvariabelewaterjuffer/variabele_selectie._dissolve.shp") %>%
    st_drop_geometry()
 
-steekproefkader_vw_orig <- read_sf("../../data/steekproefkader/variabele_steekproefkader_dissolve.shp", crs = 31370) 
+steekproefkader_vw_orig <- read_sf("../../data/steekproefkader/steekproefvariabelewaterjuffer/variabele_steekproefkader_dissolve.shp", crs = 31370) 
   
 steekproefkader_vw <- steekproefkader_vw_orig %>%
   st_transform(crs = 4326) %>%
@@ -223,26 +223,28 @@ steekproefkader_vw_update <- steekproefkader_vw %>%
          Steekproef = ifelse(Zoekzone %in% c("Z0004", "Z0038"), 1, Steekproef),
          toponiem = ifelse(Zoekzone == "Z0004", "Coupure Avelgem", toponiem),
          toponiem = ifelse(Zoekzone == "Z0038", "Oudbroekpolder", toponiem)) %>%
-  rename(deelgebied = Deelgebied, zoekzone = Zoekzone, grts_ranking = GRTS, naam = toponiem, steekproef = Steekproef)
+  select(zoekzone = Zoekzone, grts = GRTS, naam = toponiem, steekproef = Steekproef, geometry)
 
 nieuwe_locaties <- steekproefkader_vw_update %>%
   filter(naam %in% c("Coupure Avelgem", "Oudbroekpolder"))
 
-st_write(steekproefkader_vw, "../../data/steekproefkader", "variabele-waterjuffer_steekproefkader_versie2020-03-10", driver = "ESRI Shapefile", update = TRUE)
+st_write(steekproefkader_vw_update, dsn =  "../../data/steekproefkader", layer =  "variabele-waterjuffer_steekproefkader_versie2020-03-10", driver = "ESRI Shapefile", update = TRUE)
 
 st_write(nieuwe_locaties, "../../output/update_meetnetten", "wariabele-waterjuffer_addLocations_2020-03-10", driver = "ESRI Shapefile")
 ```
 
 #### Vroege glazenmaker
 
+In het meetnet Vroege glazenmaker vervangen we de locatie 'Grootbroek' door de locatie 'Doode Bemde' die al deel uitmaakt van het meetnet Variabele waterjuffer. In het meetnet Vroege glazenmaker is dit gebied opgesplitst in twee meetnetlocaties. Om de synergie tussen beide meetnetten te verhogen, vervangen we deze twee meetnetlocatie door de meetnetlocatie zoals afgelijnd in het meetnet Variabele waterjuffer.
+
 ```{r}
 
-steekproef_vg_orig <- read_sf("../../data/steekproefkader/VroegeGlazenmaker_SteekproefGebieden.shp") %>%
+steekproef_vg_orig <- read_sf("../../data/steekproefkader/steekproefvroegeglazenmaker/VroegeGlazenmaker_SteekproefGebieden.shp") %>%
    st_drop_geometry() %>%
   rename(GRTS = GRTS_gbd) %>%
   mutate(Steekproef = 1)
 
-steekproefkader_vg_orig <- read_sf("../../data/steekproefkader/vroege_steekproefkader_dissolve.shp", crs = 31370) 
+steekproefkader_vg_orig <- read_sf("../../data/steekproefkader/steekproefvroegeglazenmaker/vroege_steekproefkader_dissolve.shp", crs = 31370) 
   
 steekproefkader_vg <- steekproefkader_vg_orig %>%
   st_transform(crs = 4326) %>%
@@ -250,16 +252,20 @@ steekproefkader_vg <- steekproefkader_vg_orig %>%
   mutate(Steekproef = ifelse(is.na(Steekproef), 0, Steekproef),
          toponiem = ifelse(is.na(Toponiem), "", Toponiem))
 
+doode_bemde_vw <- steekproefkader_vw_update %>%
+  filter(naam == "Doode Bemde")
+
 steekproefkader_vg_update <- steekproefkader_vg %>%
-  mutate(Steekproef = ifelse(toponiem %in% c("Grootbroek"), 0, Steekproef),
-         Steekproef = ifelse(Zoekzone %in% c("Z0006"), 1, Steekproef),
-         toponiem = ifelse(Zoekzone == "Z0006", "Zoete waters", toponiem)) %>%
-  select(deelgebied = Deelgebied, zoekzone = Zoekzone, grts_ranking = GRTS, naam = toponiem, steekproef = Steekproef)
-
+  mutate(Steekproef = ifelse(toponiem %in% c("Grootbroek"), 0, Steekproef)) %>%
+  select(zoekzone = Zoekzone, grts = GRTS, naam = toponiem, steekproef = Steekproef, geometry) %>%
+  filter(!zoekzone %in% c("Z0007", "Z0095")) %>%
+  rbind(doode_bemde_vw) %>%
+  mutate(steekproef = ifelse(naam %in% c("Doode Bemde"), 1, steekproef)) 
+  
 nieuwe_locaties <- steekproefkader_vg_update %>%
-  filter(naam %in% c("Zoete waters"))
+  filter(naam %in% c("Doode Bemde"))
 
-st_write(steekproefkader_vw, "../../data/steekproefkader", "vroege-glazenmaker_steekproefkader_versie2020-03-10", driver = "ESRI Shapefile", update = TRUE)
+st_write(steekproefkader_vg_update, "../../data/steekproefkader", "vroege-glazenmaker_steekproefkader_versie2020-03-10_2", driver = "ESRI Shapefile", update = TRUE)
 
-st_write(nieuwe_locaties, "../../output/update_meetnetten", "vroege-glazenmaker_addLocations_2020-03-10", driver = "ESRI Shapefile", update = TRUE)
+st_write(nieuwe_locaties, "../../output/update_meetnetten", "vroege-glazenmaker_addLocations_2020-03-10_2", driver = "ESRI Shapefile", update = TRUE)
 ```
