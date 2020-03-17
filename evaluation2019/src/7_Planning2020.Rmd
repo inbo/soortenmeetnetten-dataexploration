@@ -1,6 +1,8 @@
 # Planning 2020
 
-## Kamsalamander
+## Amfibieën
+
+### Kamsalamander
 
 ```{r}
 steekproefkader_kamsalamander <- st_read("../../data/steekproefkader", "Kamsalamander_steekproefkader_WGS84_versie2019-03-07")
@@ -42,6 +44,7 @@ overzicht_meetcyclus <- locaties_kamsalamander %>%
 
 ```
 
+#### To do cyclus 2017-2019
 
 ```{r}
 
@@ -155,7 +158,7 @@ to_do_corr <- to_do %>%
   filter(!(fuiken == 1 & larventelling_gvm == 1))
 ```
 
-### Cyclus 2020-2024
+#### Cyclus 2020-2024
 
 ```{r}
 
@@ -180,6 +183,25 @@ overzicht_cyclus1_wide <- overzicht_cyclus1 %>%
 write.csv2(overzicht_cyclus1_wide, "../../output/kamsalamander_2017_2019.csv", row.names = FALSE)
 
 ```
+
+### Rugstreeppad
+
+```{r}
+overzicht_cyclus1_rugstreeppad <- evaluatie_locaties %>%
+  filter(meetnet == "Rugstreeppad") %>%
+  filter(jaar >= 2019) %>%
+  group_by(meetnet, is_sample, protocol, locatie) %>%
+  summarise(jaar = str_c(jaar, collapse = " + "),
+            voldoende_data = sum(voldoende_data) >= 1,
+            voldoende_geteld = sum(voldoende_geteld) >= 1) %>%
+  ungroup() %>%
+  group_by(meetnet) %>%
+  mutate(n = n_distinct(locatie)) %>%
+  ungroup() %>%
+  arrange(meetnet, jaar, locatie)
+```
+
+
 
 ## Libellen
 
@@ -222,15 +244,20 @@ steekproefkader_vw_update <- steekproefkader_vw %>%
   mutate(Steekproef = ifelse(toponiem %in% c("Oude Scheldearm Coupure", "Waterschei Stiemerbeekvallei"), 0, Steekproef),
          Steekproef = ifelse(Zoekzone %in% c("Z0004", "Z0038"), 1, Steekproef),
          toponiem = ifelse(Zoekzone == "Z0004", "Coupure Avelgem", toponiem),
-         toponiem = ifelse(Zoekzone == "Z0038", "Oudbroekpolder", toponiem)) %>%
+         toponiem = ifelse(Zoekzone == "Z0038", "Oudbroekpolder", toponiem),
+         toponiem = ifelse(toponiem == "Doode Bemde", "Oud-Heverlee vijvers", toponiem)) %>%
   select(zoekzone = Zoekzone, grts = GRTS, naam = toponiem, steekproef = Steekproef, geometry)
 
 nieuwe_locaties <- steekproefkader_vw_update %>%
-  filter(naam %in% c("Coupure Avelgem", "Oudbroekpolder"))
+  filter(naam %in% c("Coupure Avelgem", "Oudbroekpolder"))  %>%
+  st_transform(31370) %>%
+  st_buffer(dist = 10) %>%
+  st_buffer(dist = -10) %>%
+  st_transform(4326)
 
 st_write(steekproefkader_vw_update, dsn =  "../../data/steekproefkader", layer =  "variabele-waterjuffer_steekproefkader_versie2020-03-10", driver = "ESRI Shapefile", update = TRUE)
 
-st_write(nieuwe_locaties, "../../output/update_meetnetten", "wariabele-waterjuffer_addLocations_2020-03-10", driver = "ESRI Shapefile")
+st_write(nieuwe_locaties, "../../output/update_meetnetten", "wariabele-waterjuffer_addLocations_2020-03-10_2", driver = "ESRI Shapefile", update = TRUE)
 ```
 
 #### Vroege glazenmaker
@@ -252,20 +279,45 @@ steekproefkader_vg <- steekproefkader_vg_orig %>%
   mutate(Steekproef = ifelse(is.na(Steekproef), 0, Steekproef),
          toponiem = ifelse(is.na(Toponiem), "", Toponiem))
 
-doode_bemde_vw <- steekproefkader_vw_update %>%
-  filter(naam == "Doode Bemde")
+vijvers_vw <- steekproefkader_vw_update %>%
+  filter(naam == "Oud-Heverlee vijvers")
 
 steekproefkader_vg_update <- steekproefkader_vg %>%
   mutate(Steekproef = ifelse(toponiem %in% c("Grootbroek"), 0, Steekproef)) %>%
   select(zoekzone = Zoekzone, grts = GRTS, naam = toponiem, steekproef = Steekproef, geometry) %>%
   filter(!zoekzone %in% c("Z0007", "Z0095")) %>%
-  rbind(doode_bemde_vw) %>%
-  mutate(steekproef = ifelse(naam %in% c("Doode Bemde"), 1, steekproef)) 
+  rbind(vijvers_vw) %>%
+  mutate(steekproef = ifelse(naam %in% c("Oud-Heverlee vijvers"), 1, steekproef)) 
   
 nieuwe_locaties <- steekproefkader_vg_update %>%
-  filter(naam %in% c("Doode Bemde"))
+  filter(naam %in% c("Oud-Heverlee vijvers")) %>%
+  st_transform(31370) %>%
+  st_buffer(dist = 10) %>%
+  st_buffer(dist = -10) %>%
+  st_transform(4326)
 
 st_write(steekproefkader_vg_update, "../../data/steekproefkader", "vroege-glazenmaker_steekproefkader_versie2020-03-10_2", driver = "ESRI Shapefile", update = TRUE)
 
-st_write(nieuwe_locaties, "../../output/update_meetnetten", "vroege-glazenmaker_addLocations_2020-03-10_2", driver = "ESRI Shapefile", update = TRUE)
+st_write(nieuwe_locaties, "../../output/update_meetnetten", "vroege-glazenmaker_addLocations_2020-03-10_3", driver = "ESRI Shapefile", update = TRUE)
 ```
+
+## Vlinders
+
+### Oranje zandoogje
+
+```{r}
+overzicht_cyclus1_oz <- evaluatie_locaties %>%
+  filter(meetnet == "Oranje zandoogje") %>%
+  group_by(meetnet, is_sample, protocol, locatie) %>%
+  summarise(jaar = str_c(jaar, collapse = " + "),
+            voldoende_data = sum(voldoende_data) >= 1,
+            voldoende_geteld = sum(voldoende_geteld) >= 1) %>%
+  ungroup() %>%
+  group_by(meetnet) %>%
+  mutate(n = n_distinct(locatie)) %>%
+  ungroup() %>%
+  arrange(meetnet, jaar, locatie)
+```
+
+
+
