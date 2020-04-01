@@ -201,6 +201,25 @@ overzicht_cyclus1_rugstreeppad <- evaluatie_locaties %>%
   arrange(meetnet, jaar, locatie)
 ```
 
+### Boomkikker
+
+```{r}
+
+boomkikker_wp_2019_niet_afgewerkt <-taken %>%
+  filter(meetnet == "Boomkikker",
+         jaar >= 2019) %>%
+  distinct(meetnet, protocol, werkpakket, jaar,  locatie) %>%
+  left_join( select( evaluatie_locaties, meetnet, protocol, jaar, locatie, voldoende_geteld), by = c("meetnet", "protocol", "jaar", "locatie")) %>%
+  mutate(voldoende_geteld = ifelse(is.na(voldoende_geteld), 0, voldoende_geteld),
+         protocol = ifelse(protocol == "Padden en kikkers - Roepkoren", "roepkoren", "larven")) %>%
+  spread(key = "protocol", value = "voldoende_geteld") %>%
+  filter(roepkoren == 0 | larven == 0) %>%
+  rename(roepkoren_vold_geteld = roepkoren, larven_vold_geteld = larven)
+  
+write.csv2(boomkikker_wp_2019_niet_afgewerkt, "../../output/boomkikker_wp_2019_niet_afgewerkt.csv", row.names = FALSE)
+
+```
+
 
 
 ## Libellen
@@ -319,5 +338,18 @@ overzicht_cyclus1_oz <- evaluatie_locaties %>%
   arrange(meetnet, jaar, locatie)
 ```
 
+### Heivlinder
+
+```{r}
+heivlinder_argus_wp_2019_niet_afgewerkt <-taken %>%
+  filter(meetnet %in% c("Heivlinder", "Argusvlinder"),
+         jaar >= 2019) %>%
+  distinct(meetnet, protocol, werkpakket, jaar,  locatie) %>%
+  left_join( select( evaluatie_locaties, meetnet, protocol, jaar, locatie, voldoende_geteld), by = c("meetnet", "protocol", "jaar", "locatie")) %>%
+  mutate(voldoende_geteld = ifelse(is.na(voldoende_geteld), 0, voldoende_geteld)) %>%
+  filter(voldoende_geteld == 0)
+  
+write.csv2(heivlinder_argus_wp_2019_niet_afgewerkt, "../../output/heivlinder_argus_wp_2019_niet_afgewerkt.csv", row.names = FALSE)
+```
 
 
