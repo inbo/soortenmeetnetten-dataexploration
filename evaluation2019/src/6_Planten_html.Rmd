@@ -27,7 +27,7 @@ locaties_planten <- locaties_planten_sf %>%
 locaties_planten_sf <- locaties_planten_sf %>%
   st_transform(crs = 31370) 
   
-data_wnm_2019_orig <- read.csv2("../../data/planten/Export_opleverenplantenwaarnemingen2019finaal.csv", stringsAsFactors  = FALSE)
+data_wnm_2019_orig <- read.csv2("../../data/planten/Export_opleverenplantenwaarnemingen2019finaal_versie2020-04-07.csv", stringsAsFactors  = FALSE)
 
 data_wnm_2019_sf <- data_wnm_2019_orig %>%
   mutate(datum = as.Date(datum, format = "%d/%m/%Y"),
@@ -122,6 +122,17 @@ locaties_planten_exp <-  bezoeken_planten %>%
   ungroup() %>%
   arrange(desc(type_locatie))
 
+locaties_planten_exp_wide <- locaties_planten_exp %>%
+  select(-aantal_bezoeken_cp, -som_telpunten_cp) %>%
+  spread(key = "databank", value = "invoer_type") %>%
+  mutate(afgewerkt = ifelse(!is.na(meetnetten.be), 
+                            ifelse(meetnetten.be == "mobiel", "ja", 
+                                   ifelse(meetnetten.be == "website" & !is.na(waarnemingen.be), "ja", "nee")),
+                            "nee")) %>%
+  arrange(meetnet, locatie)
+
+write.csv2(locaties_planten_exp_wide, "../output/locaties_planten_afgewerkt2019.csv", row.names = FALSE)
+
 locaties_planten <-  bezoeken_planten %>%
   filter(aantal_telpunten_cp > 0) %>%
   arrange(type_locatie, meetnet, protocol, locatie, databank, invoer_type) %>%
@@ -130,6 +141,10 @@ locaties_planten <-  bezoeken_planten %>%
             som_telpunten_cp = sum(aantal_telpunten_cp)) %>%
   ungroup() %>%
   arrange(desc(type_locatie))
+
+
+
+
 
 meetnetten_planten <- locaties_planten %>%
   left_join(meetnetten_n_locaties, by = "meetnet") %>%
@@ -535,5 +550,36 @@ bscols(
 
 ```
 
+## Tracks
 
+
+```{r}
+
+tracks <- read_sf("../../data/versie2020-01-24/planten_tracks", "planten_tracks_versie2020-01-24") %>%
+  st_drop_geometry() %>%
+  select(meetnet, protocol = protocl, locatie, datum, schaal, code)
+
+aantallen_wnm_2019 <- data_wnm_2019 %>%
+  select(meetnet, locatie = locatie_planten, datum, code) %>%
+  left_join(select(meetnetKarakt, meetnet, protocol), by = "meetnet") %>%
+  filter(code != "", locatie != "") %>%
+  mutate(schaal = ifelse(protocol == "Vaatplanten - Aantal individuen", "aantal (Floron)",
+                         ifelse(protocol == "Vaatplanten - Oppervlakte", "oppervlakte (Floron)", NA)))
+scale_value <- tracks %>%
+  distinct(schaal, code) %>%
+  arrange(schaal, code) %>%
+  mutate(min = c(0,1, 2, 6,26, 51, 501, 0, 0, 1, 5 , 25 , 50, 500),
+         max = c(0, 1, 5, 25,50, 500, 5000, 0, 1, 5, 25 , 50 , 500, 5000),
+         aantal = (max - min)/2)
+
+aantallen_planten <- tracks %>%
+  bind_rows(aantallen_wnm_2019) %>%
+  left_join(scale_value, by = c("schaal", "code")) %>%
+  mutate(jaar = as.numeric(format(datum, "%Y")),
+         visit_id = str_c("meetnet", "datum", "locatie"),
+         levensstadium = ifelse(protocol == "Vaatplanten - Aantal individuen", "individu",
+                                ifelse(protocol == "Vaatplanten - Oppervlakte", "vegetatievlek (m²)", NA)))
+
+
+```
 

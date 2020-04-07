@@ -1,7 +1,7 @@
 
 ```{r data import}
 
-versie <- "versie2020-01-24"
+versie <- "versie2020-04-03"
 
 bezoeken <- read.csv2(paste("../../data/", versie, "/bezoeken.csv", sep = ""), stringsAsFactors = FALSE)
 
