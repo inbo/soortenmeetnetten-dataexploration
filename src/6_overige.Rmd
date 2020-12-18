@@ -41,7 +41,7 @@ overzicht_aantallen_levensstadium_overige_wide %>%
   mutate(soort_nl = ifelse(soort_wet == "Pelophylax esculenta synklepton",
                            "groene-kikker-complex", soort_nl)) %>%
   filter(soortgroep == sg) %>%
-  select(-soortgroep, "Nederlandse naam" = soort_nl, "wetenschappelijke naam" = soort_wet) %>%
+  select(-soortgroep, "Nederlandse naam" = soort_nl, "wetenschappelijke naam" = soort_wet, -"2016", -"2017", -"2018", -"2019", -levensstadium) %>%
   kable() %>%
   kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
     column_spec(2, italic = TRUE) %>%
