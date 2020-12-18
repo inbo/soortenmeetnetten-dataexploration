@@ -1,10 +1,5 @@
 ---
-title: "Dataverkenning soortenmeetnetten"
-author: 
-  -
-    name: "Toon Westra"
-    email: "Toon.Westra@inbo.be"
-  -
+title: "Dataverkenning soortenmeetnetten Vlaanderen"
 link-citations: TRUE
 site: bookdown::bookdown_site
 output:
@@ -32,16 +27,19 @@ options(knitr.kable.NA = '')
 opts_chunk$set(
   echo = FALSE, 
   eval = TRUE,
-  cache = FALSE,
-  warning = TRUE,
+  cache = TRUE,
+  warning = FALSE,
   error = TRUE,
-  message = TRUE
+  message = FALSE
 )
-library(tidyverse)
-library(INBOtheme)
+
 library(sf)
 library(kableExtra)
 library(DT)
+library(n2khab)
+library(tidyverse)
+library(INBOtheme)
+
 
 # theme_set(
 #   theme_inbo(
@@ -58,6 +56,10 @@ library(DT)
 #     )
 #   )
 # }
+
+
+source(file.path(fileman_up("soortenmeetnetten-analysis"), "src/functions_smp.R"))
+
 ```
 
 # Inleiding
