@@ -60,9 +60,67 @@ overzicht_bezoeken_tellers_long <- bind_rows(
 ```
 
 
+```{r monitoringsinspanning totaal}
+
+overzicht_bezoeken <- bezoeken %>%
+  group_by(jaar) %>%
+  summarise(n_tellingen = n_distinct(visit_id)) %>%
+  ungroup()
+
+overzicht_locaties <- bezoeken %>%
+  group_by(jaar) %>%
+  summarise(n_telgebieden = n_distinct(locatie)) %>%
+  ungroup()
+
+overzicht_tellers <- tellers %>%
+  group_by(jaar) %>%
+  summarise(n_tellers = n_distinct(naam_teller)) %>%
+  ungroup()
+
+overzicht_bezoeken_tellers_totaal <- bind_rows(
+  overzicht_bezoeken %>%
+    filter(jaar >= 2016) %>%
+    spread(key = jaar, value = n_tellingen) %>%
+    mutate(monitoringsinspanning = "aantal tellingen"),
+  overzicht_locaties %>%
+    filter(jaar >= 2016) %>%
+    spread(key = jaar, value = n_telgebieden) %>%
+    mutate(monitoringsinspanning = "aantal tellocaties"),
+  overzicht_tellers %>%
+    filter(jaar >= 2016) %>%
+    spread(key = jaar, value = n_tellers) %>%
+    mutate(monitoringsinspanning = "aantal tellers")
+  ) 
+  
+write.csv2(overzicht_bezoeken_tellers, "../output/overzicht_bezoeken_tellers.csv", row.names = FALSE)
+
+
+overzicht_bezoeken_tellers_totaal_long <- bind_rows(
+  overzicht_bezoeken %>%
+    filter(jaar >= 2016) %>%
+    rename(aantal = n_tellingen) %>%
+    mutate(monitoringsinspanning = "aantal tellingen"),
+  overzicht_locaties %>%
+    filter(jaar >= 2016) %>%
+    rename(aantal = n_telgebieden) %>%
+    mutate(monitoringsinspanning = "aantal tellocaties"),
+  overzicht_tellers %>%
+    filter(jaar >= 2016) %>%
+    rename(aantal = n_tellers) %>%
+    mutate(monitoringsinspanning = "aantal tellers")
+  ) %>%
+  arrange(jaar) %>%
+  select(monitoringsinspanning, everything())
+
+write.csv2(overzicht_bezoeken_tellers_long,
+           str_c("../output/monitoringsinspanning_", versie, ".csv"), row.names = FALSE)
+
+```
+
+
 ```{r aantallenMeetnet}
 
-aantallen_bezoek <- aantallen %>%
+aantallen_bezoek_detail <- aantallen %>%
   group_by(soortgroep, meetnet, protocol, locatie, visit_id, jaar, datum, soort_nl, soort_wet, primaire_soort, geslacht, activiteit, levensstadium) %>%
   summarise(aantal = sum(aantal, na.rm = TRUE),
             n_subsamples = n()) %>%
@@ -70,7 +128,7 @@ aantallen_bezoek <- aantallen %>%
   mutate(geslacht = ifelse(geslacht == "M", "mannelijk", 
                            ifelse(geslacht == "F", "vrouwelijk", "onbekend")))
 
-overzicht_aantallen_primair <- aantallen_bezoek %>%
+overzicht_aantallen_primair_detail <- aantallen_bezoek_detail %>%
   filter(primaire_soort) %>%
   group_by(soortgroep, meetnet, jaar, soort_nl, soort_wet, geslacht, activiteit, levensstadium) %>%
   summarise(totaal = sum(aantal),
@@ -79,12 +137,16 @@ overzicht_aantallen_primair <- aantallen_bezoek %>%
             bezoeken = n()) %>%
   ungroup()
   
-overzicht_aantallen_primair_wide <- overzicht_aantallen_primair %>%
+overzicht_aantallen_primair_detail_wide <- overzicht_aantallen_primair_detail %>%
   select(-bezoeken) %>%
   gather(totaal, gemiddeld, maximum, key = "aantal", value = "waarde") %>%
   spread(key = "jaar", value = "waarde")
 
-overzicht_aantallen_levensvorm_primair <- aantallen_bezoek %>%
+overzicht_aantallen_levensstadium_primair <- aantallen_levensstadium %>%
+  group_by(soortgroep, meetnet, protocol, locatie, visit_id, jaar, datum, soort_nl, soort_wet, primaire_soort, levensstadium) %>%
+  summarise(aantal = sum(aantal, na.rm = TRUE),
+            n_subsamples = n()) %>%
+  ungroup() %>%
   filter(primaire_soort) %>%
   group_by(soortgroep, meetnet, jaar, soort_nl, soort_wet,levensstadium) %>%
   summarise(totaal = sum(aantal),
@@ -93,43 +155,47 @@ overzicht_aantallen_levensvorm_primair <- aantallen_bezoek %>%
             bezoeken = n()) %>%
   ungroup()
   
-overzicht_aantallen_levensvorm_primair_wide <- overzicht_aantallen_levensvorm_primair %>%
+overzicht_aantallen_levensstadium_primair_wide <- overzicht_aantallen_levensstadium_primair %>%
   select(-bezoeken) %>%
   gather(totaal, gemiddeld, maximum, key = "aantal", value = "waarde") %>%
   spread(key = "jaar", value = "waarde")
 
-overzicht_aantallen_overige <- aantallen_bezoek %>%
+overzicht_aantallen_detail_overige <- aantallen_bezoek_detail %>%
   filter(!primaire_soort) %>%
   group_by(soortgroep, jaar, soort_nl, soort_wet, geslacht, activiteit, levensstadium) %>%
   summarise(totaal = sum(aantal)) %>%
   ungroup() %>%
   filter(totaal != 0)
   
-overzicht_aantallen_overige_wide <- overzicht_aantallen_overige %>%
+overzicht_aantallen_detail_overige_wide <- overzicht_aantallen_detail_overige %>%
   spread(key = "jaar", value = "totaal", fill = 0)
 
-overzicht_aantallen_levensvorm_overige <- aantallen_bezoek %>%
+overzicht_aantallen_levensstadium_overige <-  aantallen_levensstadium %>%
+  group_by(soortgroep, meetnet, protocol, locatie, visit_id, jaar, datum, soort_nl, soort_wet, primaire_soort, levensstadium) %>%
+  summarise(aantal = sum(aantal, na.rm = TRUE),
+            n_subsamples = n()) %>%
+  ungroup() %>%
   filter(!primaire_soort) %>%
   group_by(soortgroep, jaar, soort_nl, soort_wet, levensstadium) %>%
   summarise(totaal = sum(aantal)) %>%
   ungroup() %>%
   filter(totaal != 0)
   
-overzicht_aantallen_levensvorm_overige_wide <- overzicht_aantallen_levensvorm_overige %>%
+overzicht_aantallen_levensstadium_overige_wide <- overzicht_aantallen_levensstadium_overige %>%
   spread(key = "jaar", value = "totaal", fill = 0)
 
-# write.csv2(overzicht_aantallen_levensvorm_primair_wide,
+# write.csv2(overzicht_aantallen_levensstadium_primair_wide,
 #            str_c("../output/aantallen_primair_", versie, ".csv"),
 #            row.names = FALSE)
 # 
-# write.csv2(overzicht_aantallen_levensvorm_overige_wide,
+# write.csv2(overzicht_aantallen_levensstadium_overige_wide,
 #            str_c("../output/aantallen_overige_", versie, ".csv"),
 #            row.names = FALSE)
 
 ```
 
 ```{r}
-aantallen_bezoek_levensvorm <- aantallen %>%
+aantallen_bezoek_levensstadium <- aantallen_levensstadium %>%
   group_by(soortgroep, meetnet, protocol, locatie, visit_id, jaar, datum, doy, soort_nl, soort_wet, primaire_soort, levensstadium) %>%
   summarise(aantal = sum(aantal, na.rm = TRUE),
             n_subsamples = n(),
@@ -139,7 +205,7 @@ aantallen_bezoek_levensvorm <- aantallen %>%
          jaar = as.character(jaar))
 
 
-aantallen_bezoek_totaal <- aantallen %>%
+aantallen_bezoek_totaal <- aantallen_levensstadium %>%
   group_by(soortgroep, meetnet, protocol, locatie, visit_id, jaar, datum, doy, soort_nl, soort_wet, primaire_soort) %>%
   summarise(aantal = sum(aantal, na.rm = TRUE),
             maximum = max(aantal, na.rm = TRUE)) %>%
@@ -161,16 +227,39 @@ Op basis van deze gegevens geven we per soortengroep een overzicht van:
 
 ## Figuren
 
-Daarnaast vind je op deze website per meetnet een aantal figuren met de getelde aantallen per bezoek. Een 
+Daarnaast vind je op deze website per meetnet een aantal figuren met de getelde aantallen per bezoek. 
 
-Een eerste figuur geeft de evolutie van de getelde aantallen binnen het seizoen weer en dit voor elk jaar waarin er geteld werd. Onderstaand voorbeeld toont het getelde aantal Boomkikker adulten. De stippelijnen verbinden tellingen van eenzelfde locatie. Op basis hiervan krijg je een idee hoe de getelde aantallen binnen een telseizoen variëren.     
+We tonen steeds een figuur met het gemiddeld aantal getelde individuen per jaar (rode bollen) en het 95%-betrouwbaarheidsinterval hierop (rode verticale strepen). Op basis hiervan kan het gemiddelde van de getelde aantallen tussen verschillende jaren vergeleken worden. We tonen als voorbeeld een figuur met de gemiddeldes voor de Boomkikker.      
+
+```{r voorbeeldfiguur3, fig.height= 3, fig.width= 7}
+
+soort <- "Boomkikker"
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  ylim(c(0,NA)) +
+  theme(legend.position = "bottom") 
+
+```
+
+Een tweede figuur geeft de evolutie van de getelde aantallen binnen het seizoen weer en dit voor elk jaar waarin er geteld werd. Onderstaand voorbeeld toont het getelde aantal Boomkikker adulten. De stippelijnen verbinden tellingen van eenzelfde locatie. Op basis hiervan krijg je een idee hoe de getelde aantallen binnen een telseizoen variëren.     
 
 ```{r voorbeeldfiguur1, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
 soort <- "Boomkikker"
 stadium <- "adult"
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -212,27 +301,7 @@ Indien er veel tellocaties zijn, is het moeilijk om nog een patroon te herkennen
  
 ```
 
-Ten slotte tonen we ook een figuur met het gemiddeld aantal getelde individuen per jaar (rode bollen) en het 95%-betrouwbaarheidsinterval hierop (rode verticale strepen). Op basis hiervan kunnen de gemiddelde aantallen tussen verschillende jaren vergeleken worden. Indien de betrouwbaarheidsintervallen van verschillende jaren niet overlappen, kunnen we vrij zeker zijn dat er werkelijk een verschil is in populatiegrootte.     
 
-```{r voorbeeldfiguur3, fig.height= 3, fig.width= 7}
-
-soort <- "Boomkikker"
-
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort) 
-
-max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
-
-aantallen_soort_stadium %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_stadium, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
 
 
 

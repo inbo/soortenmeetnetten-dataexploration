@@ -5,7 +5,6 @@
 ```{r}
 
 overzicht_bezoeken_tellers %>%
-  select(-soortgroep) %>%
   datatable(rownames = FALSE,
             filter = 'top',
             extensions = 'Buttons', 
@@ -24,8 +23,8 @@ overzicht_bezoeken_tellers %>%
 
 ```{r}
 
-overzicht_aantallen_levensvorm_primair_wide %>%
-  select(-soortgroep, -soort_nl) %>%
+overzicht_aantallen_levensstadium_primair_wide %>%
+  select( -soort_nl) %>%
   datatable(rownames = FALSE,
             filter = 'top',
             extensions = 'Buttons', 
@@ -41,10 +40,10 @@ overzicht_aantallen_levensvorm_primair_wide %>%
 ### Overige soorten
 
 ```{r}
-overzicht_aantallen_levensvorm_overige_wide %>%
+overzicht_aantallen_levensstadium_overige_wide %>%
   mutate(soort_nl = ifelse(soort_wet == "Pelophylax esculenta synklepton",
                            "groene-kikker-complex", soort_nl)) %>%
-  filter(soortgroep == sg) %>%
+  # filter(soortgroep == sg) %>%
   datatable(rownames = FALSE,
             filter = 'top',
             extensions = 'Buttons', 

@@ -1,63 +1,33 @@
 
 
-# Data
 
 ```{r}
-versie <- "versie2020-01-24"
+versie <- get_date_export_smp()
 ```
 
-We maken gebruik van een export uit de meetnetten-databank met ingevoerde gegevens t.e.m. `r versie`.
-
+We maken gebruik gegevens die werden ingevoerd in meetnetten.be t.e.m. `r versie`.
 
 ```{r data import}
-bezoeken <- read.csv2(paste("../data/", versie, "/bezoeken.csv", sep = ""), stringsAsFactors = FALSE)
-aantallen <- read.csv2(paste("../data/", versie, "/aantallen.csv", sep = ""), stringsAsFactors = FALSE)
-werkpakketten <- read.csv2(paste("../data/", versie, "/werkpakketten.csv", sep = ""), stringsAsFactors = FALSE)
+bezoeken <- get_visits_smp()
 
-locaties <- st_read(paste("../data/", versie, "/meetnetten_locaties.gpkg", sep = ""),
-                    "locaties", quiet = TRUE)
-transecten <- st_read(paste("../data/", versie, "/meetnetten_locaties.gpkg", sep = ""),
-                    "transecten", quiet = TRUE)
+aantallen <- get_counts_smp()
+
+aantallen_levensstadium <- get_counts_smp(count_aggregation = "lifestage") %>%
+  mutate(jaar = factor(jaar))
+
+werkpakketten <- get_workpackages_smp()
+
+locaties <- get_locations_smp()
+
+transecten <- get_transects_smp()
 
 transecten_length <- transecten %>%
   st_transform(crs = 31370) %>%
   mutate(lengte = st_length(transecten)) %>%
   select(meetnet, locatie, sublocatie, lengte) %>%
   st_drop_geometry()
-  
-bezoeken <- bezoeken %>%
-  mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
-         jaar = as.numeric(format(datum, "%Y")),
-         doy = as.numeric(format(datum, "%j"))) %>%
-  group_by(meetnet, protocol, locatie, jaar) %>%
-  mutate(i_bezoek = rank(doy)) %>%
-  ungroup() %>%
-  select(soortgroep, meetnet, protocol, locatie, jaar, datum, doy, i_bezoek, everything())
 
-aantallen <- aantallen %>%
-  mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
-         jaar = as.numeric(format(datum, "%Y")),
-         doy = as.numeric(format(datum, "%j"))) %>%
-  mutate(levensstadium = ifelse(levensstadium == "adult" & soortgroep == "libellen", "imago", levensstadium)) %>%
-  select(soortgroep, meetnet, protocol, locatie, jaar, datum, doy, everything())
-
-werkpakketten <- werkpakketten %>%
-  mutate(wp_start = as.Date(start_wp, format = "%Y-%m-%d"),
-         wp_end = as.Date(einde_wp,  format = "%Y-%m-%d"),
-         doy_min = as.numeric(format(wp_start, "%j")),
-         doy_max = as.numeric(format(wp_end, "%j")),
-         doy_mid = doy_min + round((doy_max - doy_min)/2, 0),
-         jaar= as.numeric((format(wp_start, "%Y")))) %>%
-  filter(jaar == 2019)
-  
-tellers_orig <- read.csv2(paste("../data/", versie, "/tellers.csv", sep = ""), stringsAsFactors = FALSE)
-
-tellers <- tellers_orig %>%
-  mutate(datum = as.Date(start_date, format = "%Y-%m-%d"),
-         jaar = as.numeric(format(datum, "%Y")),
-         doy = as.numeric(format(datum, "%j"))) %>%
-  gather(hoofdteller, medeteller, key = "type_teller", value = "naam_teller") %>%
-  filter(naam_teller != "")
+tellers <- get_observers_smp()
 
 ```
 

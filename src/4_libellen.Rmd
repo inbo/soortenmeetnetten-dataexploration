@@ -13,7 +13,8 @@ overzicht_bezoeken_tellers %>%
   select(-soortgroep) %>%
   kable() %>%
   kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
-  collapse_rows(1)
+  collapse_rows(1) %>%
+  scroll_box(width = "100%", height = "600px")
 
 ```
 
@@ -23,19 +24,29 @@ overzicht_bezoeken_tellers %>%
 
 ```{r}
 
-overzicht_aantallen_primair_wide %>%
+# overzicht_aantallen_levensstadium_primair_wide %>%
+#   filter(soortgroep == sg) %>%
+#   filter(levensstadium != "larvenhuidje" | meetnet %in% c("Rivierrombout", "Beekrombout")) %>%
+#   mutate(type_waarneming = ifelse(activiteit == "copula", "copula",
+#                                   ifelse(activiteit == "eiafzettend", "eiafzettend",
+#                                          ifelse(levensstadium == "imago (niet uitgekleurd)", "imago (niet uitgekleurd)",
+#                                                 str_c(levensstadium, geslacht, sep = " "))))) %>%
+#   arrange(meetnet, type_waarneming) %>%
+#   select( meetnet, soort_wet, "type waarneming" = type_waarneming, aantal, "2016", "2017", "2018", "2019") %>%
+#   # select(-soortgroep, -soort_nl) %>%
+#   kable() %>%
+#   kable_styling(bootstrap_options = c("hover", "condensed")) %>%
+#     collapse_rows(c(1,2,3)) %>%
+#   scroll_box(width = "100%", height = "600px")
+
+overzicht_aantallen_levensstadium_primair_wide %>%
   filter(soortgroep == sg) %>%
   filter(levensstadium != "larvenhuidje" | meetnet %in% c("Rivierrombout", "Beekrombout")) %>%
-  mutate(type_waarneming = ifelse(activiteit == "copula", "copula",
-                                  ifelse(activiteit == "eiafzettend", "eiafzettend",
-                                         ifelse(levensstadium == "imago (niet uitgekleurd)", "imago (niet uitgekleurd)",
-                                                str_c(levensstadium, geslacht, sep = " "))))) %>%
-  arrange(meetnet, type_waarneming) %>%
-  select( meetnet, soort_wet, "type waarneming" = type_waarneming, aantal, "2016", "2017", "2018", "2019") %>%
-  # select(-soortgroep, -soort_nl) %>%
+  select(-soortgroep, -soort_nl, "Nederlandse naam" = meetnet, "wetenschappelijke naam" = soort_wet) %>%
   kable() %>%
   kable_styling(bootstrap_options = c("hover", "condensed")) %>%
-    collapse_rows(c(1,2,3)) %>%
+    column_spec(2, italic = TRUE) %>%
+    collapse_rows(c(1,2,3), target = 1) %>%
   scroll_box(width = "100%", height = "600px")
   
 ```
@@ -43,40 +54,66 @@ overzicht_aantallen_primair_wide %>%
 ### Overige soorten
 
 ```{r}
-overzicht_aantallen_overige_wide %>%
+# overzicht_aantallen_overige_wide %>%
+#   filter(soortgroep == sg) %>%
+#   #filter(levensstadium != "larvenhuidje" | meetnet %in% c("Rivierrombout", "Beekrombout")) %>%
+#   mutate(type_waarneming = ifelse(activiteit == "copula", "copula",
+#                                   ifelse(activiteit == "eiafzettend", "eiafzettend",
+#                                          ifelse(levensstadium == "imago (niet uitgekleurd)", "imago (niet uitgekleurd)",
+#                                                 str_c(levensstadium, geslacht, sep = " "))))) %>%
+#   arrange(soort_nl, type_waarneming) %>%
+#   select(soort_nl , soort_wet, "type waarneming" = type_waarneming,  "2016", "2017", "2018", "2019") %>%
+#   kable() %>%
+#   kable_styling(bootstrap_options = c("hover", "condensed")) %>%
+#     collapse_rows(c(1,2)) %>%
+#   scroll_box(width = "100%", height = "600px")
+
+overzicht_aantallen_levensstadium_overige_wide %>%
   filter(soortgroep == sg) %>%
-  #filter(levensstadium != "larvenhuidje" | meetnet %in% c("Rivierrombout", "Beekrombout")) %>%
-  mutate(type_waarneming = ifelse(activiteit == "copula", "copula",
-                                  ifelse(activiteit == "eiafzettend", "eiafzettend",
-                                         ifelse(levensstadium == "imago (niet uitgekleurd)", "imago (niet uitgekleurd)",
-                                                str_c(levensstadium, geslacht, sep = " "))))) %>%
-  arrange(soort_nl, type_waarneming) %>%
-  select(soort_nl , soort_wet, "type waarneming" = type_waarneming,  "2016", "2017", "2018", "2019") %>%
+  select(-soortgroep, "Nederlandse naam" = soort_nl, "wetenschappelijke naam" = soort_wet) %>%
   kable() %>%
-  kable_styling(bootstrap_options = c("hover", "condensed")) %>%
-    collapse_rows(c(1,2)) %>%
+  kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
+    column_spec(2, italic = TRUE) %>%
+    collapse_rows(c(1,2,3), target = 1) %>%
   scroll_box(width = "100%", height = "600px")
 ```
 
 ## Verkenning getelde aantallen {.tabset}
 
-### Gevlekte witsnuitlibel
+### Bosbeekjuffer
 
 ```{r}
-soort <- "Gevlekte witsnuitlibel"
+soort <- "Bosbeekjuffer"
 
 ```
 
-```{r Gevlektewitsnuitlibel, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+```{r Bosbeekjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
 
-aantallen_soort <- aantallen_bezoek_totaal %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+```{r Bosbeekjuffer, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
-max_soort <- max(aantallen_soort$aantal) * 1.2
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
- p <- aantallen_soort %>%
+ p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
              group= locatie, 
@@ -90,7 +127,69 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
   p #ggplotly(p) 
 
- q <- aantallen_soort %>%
+ q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ 
+```
+
+### Gevlekte witsnuitlibel
+
+```{r}
+soort <- "Gevlekte witsnuitlibel"
+
+```
+
+```{r Gevlektewitsnuitlibelgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+```{r Gevlektewitsnuitlibel, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+ q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal, 
  #            size = aantalSectiesGeteld, 
@@ -105,18 +204,103 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  q #ggplotly(q)
  
 ```
+### Hoogveenglanslibel
+
+```{r}
+soort <- "Hoogveenglanslibel"
+
+```
 
 
-```{r Gevlektewitsnuitlibelgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+```{r Hoogveenglanslibelgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
 
-aantallen_soort %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
   stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+```
+
+```{r Hoogveenglanslibel, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
+
+```
+
+### Kempense heidelibel
+
+```{r}
+soort <- "Kempense heidelibel"
+
+```
+
+```{r Kempenseheidelibelgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
 
+```
+
+```{r Kempenseheidelibel, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+ 
 ```
 
 
@@ -127,16 +311,33 @@ soort <- "Maanwaterjuffer"
 
 ```
 
+```{r Maanwaterjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
 ```{r Maanwaterjuffer, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
-aantallen_soort <- aantallen_bezoek_totaal %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
-max_soort <- max(aantallen_soort$aantal) * 1.2
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
- p <- aantallen_soort %>%
+ p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
              group= locatie, 
@@ -150,7 +351,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
   p #ggplotly(p) 
 
- q <- aantallen_soort %>%
+ q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal, 
  #            size = aantalSectiesGeteld, 
@@ -162,22 +363,59 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- q #ggplotly(q)
+ 
+```
+### Sierlijke witsnuitlibel
+
+```{r}
+soort <- "Sierlijke witsnuitlibel"
+
+```
+
+```{r Sierlijkewitsnuitlibelgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+```
+
+
+```{r Sierlijkewitsnuitlibel, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 3, fig.height= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+
  
 ```
 
 
-```{r Maanwaterjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
-
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
 
 
 
@@ -189,16 +427,33 @@ soort <- "Speerwaterjuffer"
 
 ```
 
+```{r Speerwaterjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+```
+
+
 ```{r Speerwaterjuffer, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
-aantallen_soort <- aantallen_bezoek_totaal %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
-max_soort <- max(aantallen_soort$aantal) * 1.2
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
- p <- aantallen_soort %>%
+ p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
              group= locatie, 
@@ -212,7 +467,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
   p #ggplotly(p) 
 
- q <- aantallen_soort %>%
+ q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal, 
  #            size = aantalSectiesGeteld, 
@@ -224,73 +479,8 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- q #ggplotly(q)
  
 ```
-
-
-```{r Speerwaterjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
-
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
-
-
-
-
-### Kempense heidelibel
-
-```{r}
-soort <- "Kempense heidelibel"
-
-```
-
-```{r Kempenseheidelibel, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
-
-aantallen_soort <- aantallen_bezoek_totaal %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort ) %>%
-   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
-
-max_soort <- max(aantallen_soort$aantal) * 1.2
-
- p <- aantallen_soort %>%
-  ggplot(aes(x = doy_date, 
-             y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
-  geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
-  facet_grid(soort_nl ~ jaar) +
-  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  ylim(0, max_soort) + 
-  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
-  p #ggplotly(p) 
-
- 
-```
-
-
-```{r Kempenseheidelibelgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
-
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
-
-
 
 ### Variabele waterjuffer
 
@@ -299,16 +489,34 @@ soort <- "Variabele waterjuffer"
 
 ```
 
+
+```{r Variabelewaterjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
 ```{r Variabelewaterjuffer, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
-aantallen_soort <- aantallen_bezoek_totaal %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
-max_soort <- max(aantallen_soort$aantal) * 1.2
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
- p <- aantallen_soort %>%
+ p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
              group= locatie, 
@@ -322,7 +530,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
   p #ggplotly(p) 
 
- q <- aantallen_soort %>%
+ q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal, 
  #            size = aantalSectiesGeteld, 
@@ -334,24 +542,8 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- q #ggplotly(q)
  
 ```
-
-
-```{r Variabelewaterjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
-
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
-
-
 
 
 ### Vroege glazenmaker
@@ -361,77 +553,34 @@ soort <- "Vroege glazenmaker"
 
 ```
 
-```{r Vroegeglazenmaker, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
-
-aantallen_soort <- aantallen_bezoek_totaal %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort ) %>%
-   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
-
-max_soort <- max(aantallen_soort$aantal) * 1.2
-
- p <- aantallen_soort %>%
-  ggplot(aes(x = doy_date, 
-             y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
-  geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
-  facet_grid(soort_nl ~ jaar) +
-  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  ylim(0, max_soort) + 
-  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
-  p #ggplotly(p) 
-
- q <- aantallen_soort %>%
-  ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
-  geom_point(alpha = 0.6) + 
-  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
-  facet_grid(soort_nl ~ jaar) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
-  ylim(0, max_soort) + 
-  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- q #ggplotly(q)
- 
-```
-
 
 ```{r Vroegeglazenmakergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
 
-aantallen_soort %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "imago") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
   stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
 
 ```
 
+```{r Vroegeglazenmaker, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
-
-### Bosbeekjuffer
-
-```{r}
-soort <- "Bosbeekjuffer"
-
-```
-
-```{r Bosbeekjuffer, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
-
-aantallen_soort <- aantallen_bezoek_totaal %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
-max_soort <- max(aantallen_soort$aantal) * 1.2
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
- p <- aantallen_soort %>%
+ p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
              group= locatie, 
@@ -445,7 +594,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
   p #ggplotly(p) 
 
- q <- aantallen_soort %>%
+ q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal, 
  #            size = aantalSectiesGeteld, 
@@ -457,133 +606,8 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- q #ggplotly(q)
  
 ```
-
-
-```{r Bosbeekjuffergemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
-
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
-
-
-
-### Hoogveenglanslibel
-
-```{r}
-soort <- "Hoogveenglanslibel"
-
-```
-
-```{r Hoogveenglanslibel, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
-
-aantallen_soort <- aantallen_bezoek_totaal %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort ) %>%
-   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
-
-max_soort <- max(aantallen_soort$aantal) * 1.2
-
- p <- aantallen_soort %>%
-  ggplot(aes(x = doy_date, 
-             y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
-  geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
-  facet_grid(soort_nl ~ jaar) +
-  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  ylim(0, max_soort) + 
-  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
-  p #ggplotly(p) 
-
- 
-```
-
-
-```{r Hoogveenglanslibelgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 3}
-
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
-
-
-### Rivierrombout
-
-```{r}
-soort <- "Rivierrombout"
-
-```
-
-```{r Rivierrombout, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
-
-aantallen_soort <- aantallen_bezoek_totaal %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort ) %>%
-   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
-
-max_soort <- max(aantallen_soort$aantal) * 1.2
-
- p <- aantallen_soort %>%
-  ggplot(aes(x = doy_date, 
-             y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
-  geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
-  facet_grid(soort_nl ~ jaar) +
-  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  ylim(0, max_soort) + 
-  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
-  p #ggplotly(p) 
-
- q <- aantallen_soort %>%
-  ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
-  geom_point(alpha = 0.6) + 
-  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
-  facet_grid(soort_nl ~ jaar) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
-  ylim(0, max_soort) + 
-  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- q #ggplotly(q)
- 
-```
-
-
-```{r Rivierromboutgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
-
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
-
-
-
 
 ### Beekrombout
 
@@ -592,16 +616,83 @@ soort <- "Beekrombout"
 
 ```
 
-```{r Beekrombout, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 3, fig.height= 3}
 
-aantallen_soort <- aantallen_bezoek_totaal %>%
+```{r Beekromboutgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "larvenhuidje") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+```{r Beekrombout, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
-max_soort <- max(aantallen_soort$aantal) * 1.2
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
- p <- aantallen_soort %>%
+ p <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal,
+             group= locatie, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) +  
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+  facet_grid(soort_nl ~ jaar) +
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
+  p #ggplotly(p) 
+ 
+```
+
+### Rivierrombout
+
+```{r}
+soort <- "Rivierrombout"
+
+```
+
+```{r Rivierromboutgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+  filter(levensstadium == "larvenhuidje") %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
+```{r Rivierrombout, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort ) %>%
+   mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
+max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
+
+ p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
              group= locatie, 
@@ -615,18 +706,27 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90))
   p #ggplotly(p) 
 
+ q <- aantallen_soort_stadium %>%
+  ggplot(aes(x = doy_date, 
+             y = aantal, 
+ #            size = aantalSectiesGeteld, 
+             colour = locatie)) + 
+  geom_point(alpha = 0.6) + 
+  geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
+  facet_grid(soort_nl ~ jaar) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
+  ylim(0, max_soort) + 
+  theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
  
 ```
 
 
-```{r Beekromboutgemiddeld, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 4}
 
-aantallen_soort %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_nl, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
 
-```
+
+
+
+
+
+

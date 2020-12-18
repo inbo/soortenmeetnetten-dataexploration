@@ -19,16 +19,17 @@ overzicht_bezoeken_tellers %>%
 
 ## Overzicht getelde aantallen {.tabset}
 
-### Primaire soorten
+### Meetnetsoorten
 
 ```{r}
 
-overzicht_aantallen_levensvorm_primair_wide %>%
+overzicht_aantallen_levensstadium_primair_wide %>%
   filter(soortgroep == sg) %>%
-  select(-soortgroep, -soort_nl) %>%
+  select(-soortgroep, -soort_nl, "Nederlandse naam" = meetnet, "wetenschappelijke naam" = soort_wet) %>%
   kable() %>%
   kable_styling(bootstrap_options = c("hover", "condensed")) %>%
-    collapse_rows(c(1,2,3)) %>%
+    column_spec(2, italic = TRUE) %>%
+    collapse_rows(c(1,2,3), target = 1) %>%
   scroll_box(width = "100%", height = "600px")
   
 ```
@@ -36,14 +37,15 @@ overzicht_aantallen_levensvorm_primair_wide %>%
 ### Overige soorten
 
 ```{r}
-overzicht_aantallen_levensvorm_overige_wide %>%
+overzicht_aantallen_levensstadium_overige_wide %>%
   mutate(soort_nl = ifelse(soort_wet == "Pelophylax esculenta synklepton",
                            "groene-kikker-complex", soort_nl)) %>%
   filter(soortgroep == sg) %>%
-  select(-soortgroep) %>%
+  select(-soortgroep, "Nederlandse naam" = soort_nl, "wetenschappelijke naam" = soort_wet) %>%
   kable() %>%
   kable_styling("bordered", bootstrap_options = c("hover", "condensed")) %>%
-    collapse_rows(c(1,2,3)) %>%
+    column_spec(2, italic = TRUE) %>%
+    collapse_rows(c(1,2,3), target = 1) %>%
   scroll_box(width = "100%", height = "600px")
 ```
 
@@ -56,10 +58,27 @@ soort <- "Boomkikker"
 stadium <- "adult"
 ```
 
+```{r boomkikkerMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 7}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
 
 ```{r boomkikkerAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium) , message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -103,7 +122,7 @@ stadium <- "larve"
 
 ```{r boomkikkerLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -141,16 +160,24 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-```{r boomkikkerMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 7}
+### Knoflookpad
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+```{r}
+soort <- "Knoflookpad"
+stadium <- "adult"
+```
+
+```{r knoflookpadMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 6}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort) 
 
 max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 
 aantallen_soort_stadium %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
+  filter(levensstadium != "metamorf") %>%
+  ggplot(aes(x= factor(jaar), y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
   stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
@@ -159,18 +186,9 @@ aantallen_soort_stadium %>%
 
 ```
 
-
-### Knoflookpad
-
-
-```{r}
-soort <- "Knoflookpad"
-stadium <- "adult"
-```
-
 ```{r knoflookpadAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -204,7 +222,7 @@ stadium <- "larve"
 
 ```{r knoflookpadLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 3, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -229,9 +247,17 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-```{r knoflookpadMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 6}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+### Rugstreeppad
+
+```{r}
+soort <- "Rugstreeppad"
+```
+
+
+```{r rugstreeppadMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 5, fig.width= 8}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort) 
 
@@ -244,16 +270,9 @@ aantallen_soort_stadium %>%
   stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
+  ylim(c(0,NA)) +
   theme(legend.position = "bottom") 
 
-```
-
-
-### Rugstreeppad
-
-```{r}
-soort <- "Rugstreeppad"
-stadium <- "adult"
 ```
 
 ```{r rugstreeppadAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
@@ -261,7 +280,7 @@ stadium <- "adult"
 soort <- "Rugstreeppad"
 stadium <- "adult"
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -306,7 +325,7 @@ stadium <- "juveniel"
 
 ```{r rugstreeppadJuveniel, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -337,7 +356,7 @@ stadium <- "ei"
 
 ```{r rugstreeppadEi, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -371,7 +390,7 @@ stadium <- "larve"
 
 ```{r rugstreeppadLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 6, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -396,24 +415,6 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-```{r rugstreeppadMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 5, fig.width= 6}
-
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort) 
-
-max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
-
-aantallen_soort_stadium %>%
-  filter(levensstadium != "metamorf") %>%
-  ggplot(aes(x= factor(jaar), y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_stadium, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
 
 
 ### Kamsalamander
@@ -423,9 +424,27 @@ soort <- "Kamsalamander"
 stadium <- "adult"
 ```
 
+```{r kamsalamanderMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 5, fig.width= 6}
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= factor(jaar), y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
 ```{r kamsalamanderAdult, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -472,7 +491,7 @@ stadium <- "larve"
 
 ```{r kamsalamanderLarve, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium),  message=FALSE, warning= FALSE, fig.width= 7, fig.height= 3}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -497,23 +516,7 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  
 ```
 
-```{r kamsalamanderMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 5, fig.width= 6}
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort) 
-
-max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
-
-aantallen_soort_stadium %>%
-  ggplot(aes(x= factor(jaar), y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_stadium, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
 
 
 ### Vuursalamander
@@ -525,10 +528,29 @@ stadium <- "post-metamorf"
 
 ```
 
+```{r vuursalamanderMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 4, fig.width= 4}
+
+
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+   filter(primaire_soort) %>%
+   filter(meetnet == soort) 
+
+max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
+
+aantallen_soort_stadium %>%
+  ggplot(aes(x= jaar, y = aantal)) +  
+  #geom_point(alpha = 0.6, colour = inbo.grijs) +
+  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  facet_wrap(~ soort_stadium, scale = "free_y") +
+  labs(y = "Aantal getelde individuen", x = "Jaar") +
+  theme(legend.position = "bottom") 
+
+```
+
 ```{r vuursalamanderPostmetamorf, fig.cap= str_c("Evolutie getelde aantallen binnen telperiode: ", soort, " - ", stadium), message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
 
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
+aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
   filter(doy > 150) %>%
    filter(meetnet == soort & levensstadium == stadium ) %>%
@@ -567,23 +589,6 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 ```
 
 
-```{r vuursalamanderMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 4, fig.width= 4}
 
-
-aantallen_soort_stadium <- aantallen_bezoek_levensvorm %>%
-   filter(primaire_soort) %>%
-   filter(meetnet == soort) 
-
-max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
-
-aantallen_soort_stadium %>%
-  ggplot(aes(x= jaar, y = aantal)) +  
-  #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
-  facet_wrap(~ soort_stadium, scale = "free_y") +
-  labs(y = "Aantal getelde individuen", x = "Jaar") +
-  theme(legend.position = "bottom") 
-
-```
 
 
