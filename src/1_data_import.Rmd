@@ -8,7 +8,8 @@ versie <- get_date_export_smp()
 We maken gebruik gegevens die werden ingevoerd in meetnetten.be t.e.m. `r versie`.
 
 ```{r data import}
-bezoeken <- get_visits_smp()
+bezoeken <- get_visits_smp() %>%
+  filter(validatie != -1)
 
 aantallen <- get_counts_smp()
 
@@ -17,7 +18,17 @@ aantallen_levensstadium <- get_counts_smp(count_aggregation = "lifestage") %>%
 
 werkpakketten <- get_workpackages_smp()
 
-locaties <- get_locations_smp()
+provinces_flanders <- read_sf(file.path(fileman_up("soortenmeetnetten-data"), "gis/provincies"), "Provincies2015", crs = 31370) %>%
+  select(provincie = NAAM)
+
+locaties <- get_locations_smp() 
+
+locaties_provincies <- get_locations_smp(only_active = FALSE) %>%
+  filter(locatie_type == "locatie") %>%
+  st_transform(crs = 31370) %>%
+  st_join(provinces_flanders) %>%
+  st_drop_geometry() %>%
+  select(meetnet, locatie, provincie_locatie = provincie) 
 
 transecten <- get_transects_smp()
 
@@ -27,7 +38,28 @@ transecten_length <- transecten %>%
   select(meetnet, locatie, sublocatie, lengte) %>%
   st_drop_geometry()
 
-tellers <- get_observers_smp()
+
+users_provincie <- read_vc(root = fileman_up("soortenmeetnetten-data"),file =  "raw/meetnetten_users") %>%
+  mutate(naam_teller = str_c(first_name, " ", last_name), 
+    provincie_teller = ifelse(postcode >= 9000, "Oost-Vlaanderen",
+                            ifelse(postcode >= 8000, "West-Vlaanderen",
+                                   ifelse(postcode >= 3500 & postcode < 4000, "Limburg",
+                                          ifelse(postcode >= 2000 & postcode < 3000, "Antwerpen",
+                                                 ifelse(postcode >= 1500 & postcode < 2000, "Vlaams Brabant",
+                                                        ifelse(postcode >= 3000 & postcode < 3500, "Vlaams Brabant", "Buiten Vlaanderen"))))))
+  ) %>%
+  distinct(naam_teller, provincie_teller) %>%
+  filter(!is.na(provincie_teller)) %>%
+  group_by(naam_teller) %>%
+  summarise(provincie_teller = provincie_teller[1]) %>%
+  ungroup()
+
+  
+tellers <- get_observers_smp() 
+
+tellers_provincies <- tellers %>%
+  left_join(users_provincie, by = "naam_teller") %>%
+  left_join(locaties_provincies, by = c("meetnet", "locatie"))
 
 ```
 

@@ -27,7 +27,7 @@ options(knitr.kable.NA = '')
 opts_chunk$set(
   echo = FALSE, 
   eval = TRUE,
-  cache = TRUE,
+  cache = FALSE,
   warning = FALSE,
   error = TRUE,
   message = FALSE
@@ -39,7 +39,6 @@ library(DT)
 library(n2khab)
 library(tidyverse)
 library(INBOtheme)
-
 
 # theme_set(
 #   theme_inbo(

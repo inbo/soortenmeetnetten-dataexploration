@@ -1,6 +1,90 @@
 # Resultaten van de dataverkenning
 
 
+```{r}
+
+# details per provincie
+overzicht_bezoeken_tellers_provincie_locatie_detail <- tellers_provincies %>%
+  filter(jaar >= 2016) %>%
+  group_by(soortgroep, meetnet, jaar, provincie_locatie) %>%
+  summarise(n_tellers = n_distinct(naam_teller),
+            n_tellingen = n_distinct(visit_id),
+            n_telgebieden = n_distinct(locatie)) %>%
+  ungroup() %>% 
+  select(provincie_locatie, everything()) %>%
+  arrange(provincie_locatie, soortgroep, meetnet, jaar)
+
+#write.csv2(overzicht_bezoeken_tellers_provincie_locatie_detail, "../output/overzicht_tellingen_meetnet_provincielocatie.csv")
+
+overzicht_bezoeken_tellers_provincie_teller_detail <- tellers_provincies %>%
+  filter(jaar >= 2016) %>%
+  group_by(soortgroep, meetnet, jaar, provincie_teller) %>%
+  summarise(n_tellers = n_distinct(naam_teller),
+            n_tellingen = n_distinct(visit_id),
+            n_telgebieden = n_distinct(locatie)) %>%
+  ungroup() %>% 
+  select(provincie_teller, everything()) %>%
+  arrange(provincie_teller, soortgroep, meetnet, jaar)
+
+#write.csv2(overzicht_bezoeken_tellers_provincie_teller_detail, "../output/overzicht_tellingen_meetnet_provincieteller.csv")
+
+overzicht_bezoeken_tellers_provincie_locatie <- tellers_provincies %>%
+  filter(jaar >= 2016) %>%
+  group_by(soortgroep, jaar, provincie_locatie) %>%
+  summarise(n_tellers = n_distinct(naam_teller),
+            n_tellingen = n_distinct(visit_id),
+            n_telgebieden = n_distinct(locatie)) %>%
+  ungroup() %>% 
+  select(provincie_locatie, everything()) %>%
+  arrange(provincie_locatie, soortgroep,  jaar)
+
+#write.csv2(overzicht_bezoeken_tellers_provincie_locatie, "../output/overzicht_tellingen_soortgroep_provincielocatie.csv")
+
+overzicht_bezoeken_tellers_provincie_teller <- tellers_provincies %>%
+  filter(jaar >= 2016) %>%
+  group_by(soortgroep,  jaar, provincie_teller) %>%
+  summarise(n_tellers = n_distinct(naam_teller),
+            n_tellingen = n_distinct(visit_id),
+            n_telgebieden = n_distinct(locatie)) %>%
+  ungroup() %>% 
+  select(provincie_teller, everything()) %>%
+  arrange(provincie_teller, soortgroep, jaar)
+
+#write.csv2(overzicht_bezoeken_tellers_provincie_teller, "../output/overzicht_tellingen_soortgroep_provincieteller.csv")
+
+overzicht_provincieteller <- tellers_provincies %>%
+  filter(jaar >= 2016) %>%
+  group_by(provincie_teller) %>%
+  summarise(n_tellers = n_distinct(naam_teller),
+            n_telgebieden = n_distinct(locatie)) %>%
+  ungroup() %>% 
+  select(provincie_teller, everything()) %>%
+  arrange(provincie_teller)
+
+#write.csv2(overzicht_provincieteller, "../output/overzicht_provincieteller.csv", row.names = FALSE, na = "")
+
+overzicht_provincielocatie <- tellers_provincies %>%
+  filter(jaar >= 2016) %>%
+  group_by(provincie_locatie) %>%
+  summarise(n_tellers = n_distinct(naam_teller),
+            n_telgebieden = n_distinct(locatie)) %>%
+  ungroup() %>% 
+  select(provincie_locatie, everything()) %>%
+  arrange(provincie_locatie)
+
+#write.csv2(overzicht_provincielocatie, "../output/overzicht_provincielocatie.csv", row.names = FALSE, na = "")
+
+overzicht_provincielocatie_provincieteller <- tellers_provincies %>%
+  filter(jaar >= 2016) %>%
+  group_by(provincie_locatie, provincie_teller) %>%
+  summarise(n_tellers = n_distinct(naam_teller),
+            n_telgebieden = n_distinct(locatie)) %>%
+  ungroup() %>% 
+  select(provincie_locatie, provincie_teller, everything()) %>%
+  arrange(provincie_locatie)
+```
+
+
 
 ```{r monitoringsinspanning}
 
@@ -18,6 +102,14 @@ overzicht_tellers <- tellers %>%
   group_by(soortgroep, meetnet, jaar) %>%
   summarise(n_tellers = n_distinct(naam_teller)) %>%
   ungroup()
+
+# overzicht_bezoeken_tellers <- tellers %>%
+#   filter(jaar >= 2016) %>%
+#   group_by(soortgroep, meetnet, jaar) %>%
+#   summarise(n_tellers = n_distinct(naam_teller),
+#             n_tellingen = n_distinct(visit_id),
+#             n_telgebieden = n_distinct(locatie)) %>%
+#   ungroup()
 
 overzicht_bezoeken_tellers <- bind_rows(
   overzicht_bezoeken %>%
