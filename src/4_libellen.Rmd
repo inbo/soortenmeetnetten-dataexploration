@@ -97,7 +97,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -107,6 +107,7 @@ aantallen_soort_stadium %>%
 ```{r Bosbeekjuffer, fig.cap= str_c("Evolutie getelde individuen binnen telperiode: ", soort) , message=FALSE, warning= FALSE, fig.width= 5, fig.height= 3}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
+    filter(levensstadium == "imago") %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
@@ -116,10 +117,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -129,9 +129,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
  q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -139,6 +137,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q
  
 ```
 
@@ -159,7 +158,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -171,6 +170,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -178,10 +178,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -191,9 +190,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
  q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -222,7 +219,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -233,6 +230,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -240,10 +238,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -271,7 +268,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -283,6 +280,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -290,10 +288,10 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             colour = locatie,
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -321,7 +319,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -333,6 +331,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -340,10 +339,10 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
+             group= locatie,
              colour = locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -363,7 +362,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- 
+  
 ```
 ### Sierlijke witsnuitlibel
 
@@ -382,7 +381,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -394,6 +393,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -404,7 +404,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
              group= locatie, 
              colour = locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
@@ -437,7 +437,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -449,17 +449,19 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
+
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
+             group= locatie,
              colour = locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -469,9 +471,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
  q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal
+ #            size = aantalSectiesGeteld
+              )) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -479,7 +481,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- 
+ q
 ```
 
 ### Variabele waterjuffer
@@ -500,7 +502,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -512,6 +514,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -519,10 +522,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -532,9 +534,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
  q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -542,6 +542,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+ q
  
 ```
 
@@ -564,7 +565,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -576,6 +577,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+    filter(levensstadium == "imago") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -583,10 +585,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -596,9 +597,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
  q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -606,7 +605,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
- 
+ q
 ```
 
 ### Beekrombout
@@ -627,7 +626,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -638,6 +637,7 @@ aantallen_soort_stadium %>%
 
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
+   filter(levensstadium == "larvenhuidje") %>%
    filter(meetnet == soort ) %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
@@ -646,10 +646,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 week", date_labels = "%b %d") +
@@ -676,7 +675,7 @@ aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -688,6 +687,7 @@ aantallen_soort_stadium %>%
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
    filter(meetnet == soort ) %>%
+   filter(levensstadium == "larvenhuidje") %>%
    mutate(doy_date = as.Date(doy, origin = "2016-01-01"))
 
 max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
@@ -695,10 +695,9 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -708,9 +707,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
 
  q <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -718,6 +715,7 @@ max_soort <- max(aantallen_soort_stadium$aantal) * 1.2
    labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   ylim(0, max_soort) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90)) 
+q
  
 ```
 

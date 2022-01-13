@@ -321,11 +321,11 @@ Op basis van deze gegevens geven we per soortengroep een overzicht van:
 
 Daarnaast vind je op deze website per meetnet een aantal figuren met de getelde aantallen per bezoek. 
 
-We tonen steeds een figuur met het gemiddeld aantal getelde individuen per jaar (rode bollen) en het 95%-betrouwbaarheidsinterval hierop (rode verticale strepen). Op basis hiervan kan het gemiddelde van de getelde aantallen tussen verschillende jaren vergeleken worden. We tonen als voorbeeld een figuur met de gemiddeldes voor de Boomkikker.      
+We tonen steeds een figuur met het gemiddeld aantal getelde individuen per jaar (rode bollen) en het 95%-betrouwbaarheidsinterval hierop (rode verticale strepen). Op basis hiervan kan het gemiddelde van de getelde aantallen tussen verschillende jaren vergeleken worden. We tonen als voorbeeld een figuur met de gemiddeldes voor de Kommavlinder.      
 
-```{r voorbeeldfiguur3, fig.height= 3, fig.width= 7}
+```{r voorbeeldfiguur3, fig.height= 3, fig.width= 3}
 
-soort <- "Boomkikker"
+soort <- "Kommavlinder"
 
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
@@ -336,7 +336,7 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
 aantallen_soort_stadium %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_stadium, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   ylim(c(0,NA)) +
@@ -348,8 +348,8 @@ Een tweede figuur geeft de evolutie van de getelde aantallen binnen het seizoen 
 
 ```{r voorbeeldfiguur1, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
-soort <- "Boomkikker"
-stadium <- "adult"
+soort <- "Kommavlinder"
+stadium <- "imago"
 
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%
@@ -361,10 +361,9 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
  p <- aantallen_soort_stadium %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+            group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_stadium ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -381,7 +380,8 @@ Indien er veel tellocaties zijn, is het moeilijk om nog een patroon te herkennen
   ggplot(aes(x = doy_date, 
              y = aantal, 
  #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             # colour = locatie
+    )) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 5) , size = 0.4, colour = "blue") +
   facet_grid(soort_stadium ~ jaar) +

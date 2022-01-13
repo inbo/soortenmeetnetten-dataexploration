@@ -70,7 +70,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -86,10 +86,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -134,7 +133,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -148,10 +147,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -161,9 +159,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
 
  q <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 6) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -198,7 +194,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -212,10 +208,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -225,9 +220,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
 
  q <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 6) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -262,7 +255,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -278,10 +271,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -291,9 +283,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
 
  q <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 6) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -327,7 +317,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -343,10 +333,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -382,7 +371,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -396,10 +385,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -430,7 +418,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -446,10 +434,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -459,9 +446,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
 
  q <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 6) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -495,7 +480,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -514,7 +499,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
              group= locatie, 
              colour = locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -544,7 +529,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -560,10 +545,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -573,9 +557,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
 
  q <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 6) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -605,7 +587,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -624,7 +606,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
              group= locatie, 
              colour = locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -654,7 +636,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -670,10 +652,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -683,9 +664,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
 
   q <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 6) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
@@ -719,7 +698,7 @@ aantallen_soort <- aantallen_bezoek_totaal %>%
 aantallen_soort %>%
   ggplot(aes(x= jaar, y = aantal)) +  
   #geom_point(alpha = 0.6, colour = inbo.grijs) +
-  stat_summary(fun.data = "mean_cl_boot", colour = INBOred, size = 1, alpha = 0.8) +
+  stat_summary(fun.data = "mean_cl_boot", colour = inbo_rood, size = 1, alpha = 0.8) +
   facet_wrap(~ soort_nl, scale = "free_y") +
   labs(y = "Aantal getelde individuen", x = "Jaar") +
   theme(legend.position = "bottom") 
@@ -734,10 +713,9 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
  p <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
              y = aantal,
-             group= locatie, 
-             colour = locatie)) + 
+             group= locatie)) + 
   geom_point(alpha = 0.6) +  
- geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo.grijsblauw)  + 
+ geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_nl ~ jaar) +
   labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -747,9 +725,7 @@ max_soort <- max(aantallen_soort$aantal) * 1.2
 
   q <- aantallen_soort %>%
   ggplot(aes(x = doy_date, 
-             y = aantal, 
- #            size = aantalSectiesGeteld, 
-             colour = locatie)) + 
+             y = aantal)) + 
   geom_point(alpha = 0.6) + 
   geom_smooth(method = "gam", method.args = list(family = poisson),formula = y ~ s(x, bs = "cs", k = 6) , size = 0.4, colour = "blue") +
   facet_grid(soort_nl ~ jaar) +
