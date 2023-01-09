@@ -23,7 +23,7 @@ aantallen_levensstadium <- get_counts_smp(count_aggregation = "lifestage")  %>%
 werkpakketten <- get_workpackages_smp()  %>%
   filter(meetnet != "Vleermuizen - Wintertellingen")
 
-provinces_flanders <- read_sf(file.path(fileman_up("soortenmeetnetten-data"), "gis/provincies"), "Provincies2015", crs = 31370) %>%
+provinces_flanders <- read_sf(file.path(fileman_up("soortenmeetnetten-queries"), "gis/provincies"), "Provincies2015", crs = 31370) %>%
   select(provincie = NAAM)
 
 locaties <- get_locations_smp()  %>%
@@ -45,7 +45,7 @@ transecten_length <- transecten %>%
   st_drop_geometry()
 
 
-users_provincie <- read_vc(root = fileman_up("soortenmeetnetten-data"),file =  "raw/meetnetten_users") %>%
+users_provincie <- read_vc(root = fileman_up("soortenmeetnetten-queries"),file =  "raw/meetnetten_users") %>%
   mutate(naam_teller = str_c(first_name, " ", last_name), 
     provincie_teller = ifelse(postcode >= 9000, "Oost-Vlaanderen",
                             ifelse(postcode >= 8000, "West-Vlaanderen",

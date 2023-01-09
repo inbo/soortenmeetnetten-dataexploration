@@ -58,7 +58,7 @@ source(file.path(fileman_up("soortenmeetnetten-analysis"), "src/functions_smp.R"
 
 # Inleiding
 
-Op deze website worden de ingevoerde telgegevens in [meetnetten.be](https://www.meetnetten.be/) verkent. [meetnetten.be](https://www.meetnetten.be/) is een citizen science project dat als doel heeft om Vlaamse en Europese prioritaire soorten te monitoren ter ondersteuning van het Vlaamse natuurbeleid. [meetnetten.be](https://www.meetnetten.be/) bestaat uit een reeks gestructureerde meetnetten die werden ontwikkeld door het Instituut voor Natuur- en Bosonderzoek. Natuurpunt Studie staat in voor de coördinatie van het veldwerk en de telgegevens worden ingezameld door vrijwilligers.
+Op deze website worden de ingevoerde telgegevens in [meetnetten.be](https://www.meetnetten.be/) verkent. [meetnetten.be](https://www.meetnetten.be/) is een citizen science project dat als doel heeft om Vlaamse en Europese prioritaire soorten te monitoren ter ondersteuning van het Vlaamse natuurbeleid. [meetnetten.be](https://www.meetnetten.be/) bestaat uit een reeks gestructureerde meetnetten die werden ontwikkeld door het Instituut voor Natuur- en Bosonderzoek (INBO) en het Agentschap voor Natuur en Bos (ANB). Natuurpunt Studie staat in voor de coördinatie van het veldwerk en de telgegevens worden ingezameld door vrijwilligers.
 
 
 ```{r banner, fig.width= 9, cache= FALSE}
