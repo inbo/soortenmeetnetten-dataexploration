@@ -60,7 +60,7 @@ soort <- "Boomkikker"
 stadium <- "adult"
 ```
 
-```{r boomkikkerMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 8}
+```{r boomkikkerMean, fig.cap= str_c("Evolutie gemiddelde getelde aantallen per bezoek: ", soort), fig.height= 3, fig.width= 10}
 
 aantallen_soort_stadium <- aantallen_bezoek_levensstadium %>%
    filter(primaire_soort) %>%

@@ -2,10 +2,19 @@
 
 
 ```{r}
-year_evaluation <- 2022
+year_evaluation <- 2024
+
+# n_locaties per provincie
+
+locaties_provincies_overzicht <- locaties_provincies_active %>%
+  group_by(provincie_locatie, meetnet) %>%
+  summarise(n_telgebieden_totaal = n_distinct(locatie)) %>%
+  ungroup()
+
 
 # details per provincie
 overzicht_bezoeken_tellers_provincie_locatie_detail <- tellers_provincies %>%
+  semi_join(locaties_provincies_active, by = c("meetnet", "locatie")) %>%
   filter(jaar >= 2016) %>%
   group_by(soortgroep, meetnet, jaar, provincie_locatie) %>%
   summarise(n_tellers = n_distinct(naam_teller),
@@ -20,6 +29,8 @@ write.csv2(overzicht_bezoeken_tellers_provincie_locatie_detail, "../output/overz
 overzicht_bezoeken_tellers_provincie_locatie_detail %>%
   filter(jaar == year_evaluation) %>%
   filter(!is.na(provincie_locatie)) %>%
+  left_join(locaties_provincies_overzicht, by = c("provincie_locatie", "meetnet")) %>%
+  select(provincie = provincie_locatie, jaar, soortgroep, meetnet, aantal_tellocaties_totaal = n_telgebieden_totaal, aantal_tellers = n_tellers, aantal_tellingen =  n_tellingen, aantal_tellocaties_geteld = n_telgebieden) %>%
   write_excel_csv2(str_c("../output/monitoringinspanning_meetnet_provincielocatie_", year_evaluation, ".csv"))
 
 overzicht_bezoeken_tellers_provincie_teller_detail <- tellers_provincies %>%
@@ -84,6 +95,7 @@ write.csv2(overzicht_provincielocatie, "../output/overzicht_provincielocatie.csv
 overzicht_provincielocatie %>%
   filter(jaar == year_evaluation) %>%
   filter(!is.na(provincie_locatie)) %>%
+  rename( aantal_tellers = n_tellers, aantal_tellingen =  n_tellingen, aantal_tellocaties_geteld = n_telgebieden) %>%
   write_excel_csv2(str_c("../output/monitoringinspanning_totaal_provincielocatie_", year_evaluation, ".csv"))
 
 overzicht_provincielocatie_provincieteller <- tellers_provincies %>%
@@ -338,7 +350,7 @@ Daarnaast vind je op deze website per meetnet een aantal figuren met de getelde 
 
 We tonen steeds een figuur met het gemiddeld aantal getelde individuen per jaar (rode bollen) en het 95%-betrouwbaarheidsinterval hierop (rode verticale strepen). Op basis hiervan kan het gemiddelde van de getelde aantallen tussen verschillende jaren vergeleken worden. We tonen als voorbeeld een figuur met de gemiddeldes voor de Kommavlinder.      
 
-```{r voorbeeldfiguur3, fig.height= 3, fig.width= 3}
+```{r voorbeeldfiguur3, fig.height= 3, fig.width= 4}
 
 soort <- "Kommavlinder"
 
@@ -359,7 +371,7 @@ aantallen_soort_stadium %>%
 
 ```
 
-Een tweede figuur geeft de evolutie van de getelde aantallen binnen het seizoen weer en dit voor elk jaar waarin er geteld werd. Onderstaand voorbeeld toont het getelde aantal Boomkikker adulten. De stippelijnen verbinden tellingen van eenzelfde locatie. Op basis hiervan krijg je een idee hoe de getelde aantallen binnen een telseizoen variëren.     
+Een tweede figuur geeft de evolutie van de getelde aantallen binnen het seizoen weer en dit voor elk jaar waarin er geteld werd. Onderstaand voorbeeld toont het getelde aantal individuen van de Kommavlinder. De stippelijnen verbinden tellingen van eenzelfde locatie. Op basis hiervan krijg je een idee hoe de getelde aantallen binnen een telseizoen variëren.     
 
 ```{r voorbeeldfiguur1, message=FALSE, warning= FALSE, fig.width= 8, fig.height= 3}
 
@@ -380,7 +392,7 @@ max_soort_stadium <- max(aantallen_soort_stadium$aantal) * 1.2
   geom_point(alpha = 0.6) +  
  geom_line(linetype = 2,  alpha = 0.6, size = 0.4, colour = inbo_grijsblauw)  + 
   facet_grid(soort_stadium ~ jaar) +
-  labs(x = "Datum bezoek", y = "Aantal getelde adulten") + 
+  labs(x = "Datum bezoek", y = "Aantal getelde individuen") + 
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   ylim(0, max_soort_stadium) + 
   theme(legend.position = 'none', axis.text.x = element_text(angle = 90))

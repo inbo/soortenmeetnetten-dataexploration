@@ -2,7 +2,7 @@
 
 
 ```{r}
-versie <- get_date_export_smp()
+versie <- "2025-03-19"
 ```
 
 We maken gebruik gegevens die werden ingevoerd in meetnetten.be t.e.m. `r versie`.
@@ -31,7 +31,13 @@ locaties_provincies <- get_locations_smp(only_active = FALSE) %>%
   st_transform(crs = 31370) %>%
   st_join(provinces_flanders) %>%
   st_drop_geometry() %>%
-  select(meetnet, locatie, provincie_locatie = provincie) 
+  select(meetnet, locatie, provincie_locatie = provincie, is_active) 
+
+locaties_provincies_active <- locaties_provincies %>%
+  filter(is_active)
+
+locaties_provincies <- locaties_provincies %>%
+  select(-is_active)
 
 transecten <- get_transects_smp()
 
